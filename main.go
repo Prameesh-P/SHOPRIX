@@ -1,12 +1,11 @@
 package main
 
 import (
+	"github.com/Prameesh-P/SHOPRIX/routes"
 	"os"
 
-	"github.com/MohamedmuhsinJ/shopify/controllers"
-	"github.com/MohamedmuhsinJ/shopify/database"
-	"github.com/MohamedmuhsinJ/shopify/initalizers"
-	"github.com/MohamedmuhsinJ/shopify/middlewares"
+	"github.com/Prameesh-P/SHOPRIX/database"
+	"github.com/Prameesh-P/SHOPRIX/initalizers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,13 +22,8 @@ func main() {
 		port = "3000"
 	}
 	router := gin.Default()
-	// controllers.Otp("9159564424")
-	// controllers.CheckOtp("9159564424")
-	router.POST("/signup", controllers.Signup)
-	router.POST("/login", controllers.Login)
-	router.GET("/validate", middlewares.RequireAuth, controllers.Validate)
+	routes.UserRoutes(router)
+	routes.AdminRoutes(router)
 	router.Run()
 
-	// routes.AuthRoutes(router)
-	// routes.UserRoutes(router)
 }

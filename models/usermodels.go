@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -11,4 +14,26 @@ type User struct {
 	Phone         string `json:"phone"  validate:"required"`
 	Token         string `json:"token"`
 	Refresh_token string `json:"referesh_token" `
+}
+type Admin struct {
+	gorm.Model
+	Email    string `json:"email" validate:"required,min=5,max=100"`
+	Password string `json:"password" validate:"required,min=3,max=100"`
+}
+
+func (u *User) HashPassword(password string) error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return err
+	}
+	u.Password = string(bytes)
+	return nil
+}
+func (a *Admin) HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	if err != nil {
+		return "", err
+	}
+	a.Password = string(bytes)
+	return a.Password, nil
 }

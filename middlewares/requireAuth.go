@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/MohamedmuhsinJ/shopify/database"
-	"github.com/MohamedmuhsinJ/shopify/models"
+	"github.com/Prameesh-P/SHOPRIX/database"
+	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
