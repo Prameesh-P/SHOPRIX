@@ -14,5 +14,6 @@ func AdminRoutes(ctx *gin.Engine) {
 		admin.GET("/", middlewares.AdminAuth(), c.AdminHome)
 		admin.GET("/userdata", middlewares.AdminAuth(), c.Userdata)
 		admin.PUT("/userdata/block/:id", middlewares.AdminAuth(), c.BlockUser)
+		admin.PUT("/userdata/unblock/:id", middlewares.AdminAuth(), c.UnBlockUser)
 	}
 }
