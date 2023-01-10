@@ -74,8 +74,8 @@ func AdminLogin(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	tokenString, err := authentification.GenerateJWT(admin.Email)
-	token := tokenString["access_token"]
+	tokenstring, err := authentification.GenerateJWT(admin.Email)
+	token := tokenstring["access_token"]
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("AdminJWT", token, 3600*24*30, "", "", false, true)
 	if err != nil {
@@ -88,11 +88,30 @@ func AdminLogin(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":      "true",
 		"msg":         "OK",
-		"tokenstring": tokenString,
+		"tokenstring": tokenstring,
 	})
 }
 func AdminHome(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(202, gin.H{
 		"status": "Welcome to admin home page ",
+	})
+}
+
+type Userdat struct {
+	ID         uint
+	First_Name string
+	Last_Name  string
+	Email      string
+	Phone      string
+}
+
+func Userdata(c *gin.Context) {
+	var user Userdat
+	i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users  ORDER BY id ASC ").Scan(&user)
+	if search := c.Query("search"); search != "" {
+		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users WHERE fist_name like ? ORDER BY  id ASC ", search).Scan(&user)
+	}
+	c.JSON(200, gin.H{
+		"user": user,
 	})
 }

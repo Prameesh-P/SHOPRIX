@@ -12,5 +12,6 @@ func AdminRoutes(ctx *gin.Engine) {
 		admin.POST("/signup", c.AdminSignup)
 		admin.POST("/login", c.AdminLogin)
 		admin.GET("/", middlewares.AdminAuth(), c.AdminHome)
+		admin.GET("/userdata", middlewares.AdminAuth(), c.Userdata)
 	}
 }

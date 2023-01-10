@@ -7,9 +7,14 @@ import (
 )
 
 func UserRoutes(ctx *gin.Engine) {
+
+	user := ctx.Group("/user")
+	{
+		user.GET("/", c.UserHome)
+
+	}
 	ctx.POST("/signup", c.Signup)
 	ctx.POST("/login", c.Login)
-	ctx.GET("/", c.UserHome)
-	ctx.POST("/forgetpassword", c.ForgetPassword)
-	ctx.GET("/validate", middlewares.RequireAuth, c.Validate)
+	ctx.POST("/forgetpassword", middlewares.UserAuth(), c.ForgetPassword)
+	ctx.GET("/validate", middlewares.UserAuth(), c.Validate)
 }

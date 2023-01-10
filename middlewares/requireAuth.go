@@ -7,8 +7,8 @@ import (
 
 func AdminAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		// tokenString := context.GetHeader("Authorization")
-		tokenString, err := context.Cookie("Adminjwt")
+
+		tokenString, err := context.Cookie("AdminJWT")
 		if tokenString == "" {
 			context.JSON(401, gin.H{"error": "request does not contain an access token"})
 			context.Abort()
@@ -25,7 +25,7 @@ func AdminAuth() gin.HandlerFunc {
 }
 func UserAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		tokenString, err := context.Cookie("UserAuth")
+		tokenString, err := context.Cookie("UserJWT")
 		if tokenString == "" {
 			context.JSON(401, gin.H{
 				"error": "Request does not contain an access token",
