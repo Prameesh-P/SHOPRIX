@@ -107,11 +107,10 @@ type Userdat struct {
 
 func Userdata(c *gin.Context) {
 	var user Userdat
-	i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users  ORDER BY id ASC ").Scan(&user)
+	i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users ORDER BY id ASC").Scan(&user)
 	if search := c.Query("search"); search != "" {
-		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users WHERE fist_name like ? ORDER BY  id ASC ", search).Scan(&user)
+		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users where first_name like ? ORDER BY id ASC ", search).Scan(&user)
 	}
-	c.JSON(200, gin.H{
-		"user": user,
-	})
+
+	c.JSON(200, gin.H{"user": user})
 }
