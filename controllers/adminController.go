@@ -114,3 +114,11 @@ func Userdata(c *gin.Context) {
 
 	c.JSON(200, gin.H{"user": user})
 }
+func BlockUser(c *gin.Context) {
+	params := c.Param("id")
+	var user models.User
+	i.Db.Raw("UPDATE users SET block_status=true WHERE id=?", params).Scan(&user)
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "Blocked Successfully",
+	})
+}

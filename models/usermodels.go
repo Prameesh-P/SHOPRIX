@@ -12,6 +12,7 @@ type User struct {
 	Email         string `json:"email" gorm:"unique" validate:"email,required" `
 	Password      string `json:"password" validate:"required,min=6"`
 	Phone         string `json:"phone"  validate:"required"`
+	Block_status  bool   `json:"block_Status" `
 	Token         string `json:"token"`
 	Refresh_token string `json:"referesh_token" `
 }

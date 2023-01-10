@@ -15,11 +15,12 @@ import (
 
 func Signup(c *gin.Context) {
 	var body struct {
-		First_name string
-		Last_name  string
-		Email      string
-		Password   string
-		Phone      string
+		First_name   string
+		Last_name    string
+		Email        string
+		Password     string
+		Phone        string
+		Block_status bool
 	}
 	if c.ShouldBind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -33,7 +34,7 @@ func Signup(c *gin.Context) {
 		})
 		return
 	}
-	user := models.User{First_name: body.First_name, Last_name: body.Last_name, Email: body.Email, Password: string(hash), Phone: body.Phone}
+	user := models.User{First_name: body.First_name, Last_name: body.Last_name, Email: body.Email, Password: string(hash), Phone: body.Phone, Block_status: body.Block_status}
 	result := database.Db.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -63,6 +64,13 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",
 		})
+		return
+	}
+	if user.Block_status {
+		c.JSON(404, gin.H{
+			"msg": "user has been Blocked by admin",
+		})
+		c.Abort()
 		return
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
