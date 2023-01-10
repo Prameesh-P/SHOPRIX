@@ -37,3 +37,10 @@ func (a *Admin) HashPassword(password string) (string, error) {
 	a.Password = string(bytes)
 	return a.Password, nil
 }
+func (a *Admin) CheckPassword(incomingPass string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(incomingPass))
+	if err != nil {
+		return err
+	}
+	return nil
+}

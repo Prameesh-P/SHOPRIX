@@ -1,57 +1,47 @@
 package middlewares
 
 import (
-	"fmt"
-	"net/http"
-	"os"
-	"time"
-
-	"github.com/Prameesh-P/SHOPRIX/database"
-	"github.com/Prameesh-P/SHOPRIX/models"
+	"github.com/Prameesh-P/SHOPRIX/authentification"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 )
 
-func RequireAuth(c *gin.Context) {
-	//get the coookie req
-	tokenString, err := c.Cookie("Authorization")
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-	}
-
-	//parse token string and function for loop
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+func AdminAuth() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		// tokenString := context.GetHeader("Authorization")
+		tokenString, err := context.Cookie("Adminjwt")
+		if tokenString == "" {
+			context.JSON(401, gin.H{"error": "request does not contain an access token"})
+			context.Abort()
+			return
+		}
+		err = authentification.ValidateToken(tokenString)
 		if err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			context.JSON(401, gin.H{"error": err.Error()})
+			context.Abort()
+			return
 		}
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(os.Getenv("Secret]")), nil
-	})
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
-
-		//find the user
-		var user models.User
-		database.Db.First(&user, "email=?", claims["sub"])
-
-		if user.ID == 0 {
-			c.AbortWithStatus(http.StatusUnauthorized)
-
-		}
-
-		//attach to req
-		c.Set("us", user)
-
-		//continue
-		c.Next()
-	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		context.Next()
 	}
-
+}
+func UserAuth() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		tokenString, err := context.Cookie("UserAuth")
+		if tokenString == "" {
+			context.JSON(401, gin.H{
+				"error": "Request does not contain an access token",
+			})
+			context.Abort()
+			return
+		}
+		err = authentification.ValidateToken(tokenString)
+		context.Set("user", authentification.P)
+		if err != nil {
+			context.JSON(401, gin.H{
+				"error": err.Error(),
+			})
+			context.Abort()
+			return
+		}
+		context.Next()
+	}
 }

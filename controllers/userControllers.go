@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"os"
@@ -97,24 +98,26 @@ func UserHome(c *gin.Context) {
 }
 func ForgetPassword(c *gin.Context) {
 	var user models.User
-	var forUser struct {
-		Email       string
-		NewPassword string
-	}
-	if err := c.ShouldBind(&forUser); err != nil {
-		c.JSON(404, gin.H{
-			"error": err.Error(),
-		})
-	}
-	database.Db.Raw("SELECT * FROM users WHERE email=?", forUser.Email).Scan(&user)
-	if err := user.HashPassword(forUser.NewPassword); err != nil {
-		c.JSON(404, gin.H{
-			"error": err.Error(),
-		})
-		database.Db.Raw("UPDATE users SET password=? WHERE email=?", forUser.NewPassword, forUser.Email).Scan(&user)
+	useremail := c.GetString("user")
+	newpassword := c.PostForm("password")
+	database.Db.Raw("select password,id from users where email=?", useremail).Scan(&user)
+	// user.Password=newpassword
+	if err := user.HashPassword(newpassword); err != nil {
+		c.JSON(404, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
+	fmt.Println(user.HashPassword(newpassword))
+
+	database.Db.Raw("update users set password=? where id=?", user.Password, user.ID).Scan(&user)
+	fmt.Println(useremail)
+
+	fmt.Println(newpassword)
+	c.JSON(200, gin.H{
+		"pass":  newpassword,
+		"email": useremail,
+	})
+
 }
 
 func Validate(c *gin.Context) {
