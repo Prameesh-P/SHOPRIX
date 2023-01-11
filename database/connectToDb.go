@@ -11,7 +11,6 @@ var Db *gorm.DB
 
 func ConnectToDb() {
 	var err error
-
 	DBHost := os.Getenv("dbHost")
 	DBUser := os.Getenv("dbUser")
 	DBPassword := os.Getenv("dbPassword")
