@@ -16,7 +16,7 @@ func ConnectToDb() {
 	DBPassword := os.Getenv("dbPassword")
 	DBName := os.Getenv("dbName")
 	DDPort := os.Getenv("dbPort")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s DBName=%s sslmode=disable port=%s", DBHost, DBUser, DBPassword, DBName, DDPort)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable port=%s", DBHost, DBUser, DBPassword, DBName, DDPort)
 	Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Db not connected")

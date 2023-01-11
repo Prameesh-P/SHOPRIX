@@ -45,3 +45,9 @@ func (a *Admin) CheckPassword(incomingPass string) error {
 	}
 	return nil
 }
+
+type Otp struct {
+	gorm.Model
+	Mobile string
+	Otp    string
+}

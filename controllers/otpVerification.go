@@ -64,7 +64,7 @@ func OtpLog(c *gin.Context) {
 func CheckNumber(str string) bool {
 	mobileNumber := str
 	var checkOtp models.User
-	database.Db.Raw("SELECT phone FROM user WHERE phone=?", mobileNumber).Scan(&checkOtp)
+	database.Db.Raw("SELECT phone FROM users WHERE phone=?", mobileNumber).Scan(&checkOtp)
 	return checkOtp.Phone == mobileNumber
 }
 func CheckOTP(c *gin.Context) {
