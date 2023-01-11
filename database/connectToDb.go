@@ -12,12 +12,12 @@ var Db *gorm.DB
 func ConnectToDb() {
 	var err error
 
-	dbhost := os.Getenv("dbHost")
-	dbuser := os.Getenv("dbUser")
-	dbpassword := os.Getenv("dbPassword")
-	dbname := os.Getenv("dbName")
-	dbport := os.Getenv("dbPort")
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable port=%s", dbhost, dbuser, dbpassword, dbname, dbport)
+	DBHost := os.Getenv("dbHost")
+	DBUser := os.Getenv("dbUser")
+	DBPassword := os.Getenv("dbPassword")
+	DBName := os.Getenv("dbName")
+	DDPort := os.Getenv("dbPort")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s DBName=%s sslmode=disable port=%s", DBHost, DBUser, DBPassword, DBName, DDPort)
 	Db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Db not connected")
