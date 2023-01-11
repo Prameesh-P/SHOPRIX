@@ -15,12 +15,12 @@ import (
 
 func Signup(c *gin.Context) {
 	var body struct {
-		First_name   string
-		Last_name    string
-		Email        string
-		Password     string
-		Phone        string
-		Block_status bool
+		FirstName   string
+		LastName    string
+		Email       string
+		Password    string
+		Phone       string
+		BlockStatus bool
 	}
 	if c.ShouldBind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -34,7 +34,7 @@ func Signup(c *gin.Context) {
 		})
 		return
 	}
-	user := models.User{First_name: body.First_name, Last_name: body.Last_name, Email: body.Email, Password: string(hash), Phone: body.Phone, Block_status: body.Block_status}
+	user := models.User{FirstName: body.FirstName, LastName: body.LastName, Email: body.Email, Password: string(hash), Phone: body.Phone, BlockStatus: body.BlockStatus}
 	result := database.Db.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -66,7 +66,7 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	if user.Block_status {
+	if user.BlockStatus {
 		c.JSON(404, gin.H{
 			"msg": "user has been Blocked by admin",
 		})
@@ -106,24 +106,24 @@ func UserHome(c *gin.Context) {
 }
 func ForgetPassword(c *gin.Context) {
 	var user models.User
-	useremail := c.GetString("user")
-	newpassword := c.PostForm("password")
-	database.Db.Raw("select password,id from users where email=?", useremail).Scan(&user)
-	// user.Password=newpassword
-	if err := user.HashPassword(newpassword); err != nil {
+	UserEmail := c.GetString("user")
+	NewPassword := c.PostForm("password")
+	database.Db.Raw("select password,id from users where email=?", UserEmail).Scan(&user)
+	// user.Password=NewPassword
+	if err := user.HashPassword(NewPassword); err != nil {
 		c.JSON(404, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
-	fmt.Println(user.HashPassword(newpassword))
+	fmt.Println(user.HashPassword(NewPassword))
 
 	database.Db.Raw("update users set password=? where id=?", user.Password, user.ID).Scan(&user)
-	fmt.Println(useremail)
+	fmt.Println(UserEmail)
 
-	fmt.Println(newpassword)
+	fmt.Println(NewPassword)
 	c.JSON(200, gin.H{
-		"pass":  newpassword,
-		"email": useremail,
+		"pass":  NewPassword,
+		"email": UserEmail,
 	})
 
 }

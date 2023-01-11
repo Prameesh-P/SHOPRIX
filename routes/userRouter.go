@@ -6,15 +6,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserRoutes(ctx *gin.Engine) {
+func UserRoutes(routes *gin.Engine) {
 
-	user := ctx.Group("/user")
+	user := routes.Group("/user")
 	{
 		user.GET("/", c.UserHome)
-
 	}
-	ctx.POST("/signup", c.Signup)
-	ctx.POST("/login", c.Login)
-	ctx.POST("/forgetpassword", middlewares.UserAuth(), c.ForgetPassword)
-	ctx.GET("/validate", middlewares.UserAuth(), c.Validate)
+	routes.POST("/signup", c.Signup)
+	routes.POST("/login", c.Login)
+	routes.POST("/forgetpassword", middlewares.UserAuth(), c.ForgetPassword)
+	routes.GET("/validate", middlewares.UserAuth(), c.Validate)
+	routes.POST("/login/otp", c.OtpLog)
+	routes.POST("/login/otpvalidate", c.CheckOTP)
 }

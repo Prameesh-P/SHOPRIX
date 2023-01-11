@@ -74,8 +74,8 @@ func AdminLogin(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	tokenstring, err := authentification.GenerateJWT(admin.Email)
-	token := tokenstring["access_token"]
+	tokenString, err := authentification.GenerateJWT(admin.Email)
+	token := tokenString["access_token"]
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("AdminJWT", token, 3600*24*30, "", "", false, true)
 	if err != nil {
@@ -88,7 +88,7 @@ func AdminLogin(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status":      "true",
 		"msg":         "OK",
-		"tokenstring": tokenstring,
+		"tokenString": tokenString,
 	})
 }
 func AdminHome(c *gin.Context) {
@@ -97,16 +97,16 @@ func AdminHome(c *gin.Context) {
 	})
 }
 
-type Userdat struct {
-	ID         uint
-	First_Name string
-	Last_Name  string
-	Email      string
-	Phone      string
+type UserDataStruct struct {
+	ID        uint
+	FirstName string
+	LastName  string
+	Email     string
+	Phone     string
 }
 
-func Userdata(c *gin.Context) {
-	var user Userdat
+func UserData(c *gin.Context) {
+	var user UserDataStruct
 	i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users ORDER BY id ASC").Scan(&user)
 	if search := c.Query("search"); search != "" {
 		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users where first_name like ? ORDER BY id ASC ", search).Scan(&user)
@@ -117,16 +117,12 @@ func Userdata(c *gin.Context) {
 func BlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User
-	i.Db.Raw("UPDATE users SET block_status=true WHERE id=?", params).Scan(&user)
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "Blocked Successfully",
-	})
+	i.Db.Raw("UPDATE users SET block_status=true where id=?", params).Scan(&user)
+	c.JSON(http.StatusOK, gin.H{"msg": "Blocked succesfully"})
 }
 func UnBlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User
-	i.Db.Raw("UPDATE users SET block_user=false where id=?", params).Scan(&user)
-	c.JSON(http.StatusOK, gin.H{
-		"Msg": "Unblocked Successfully",
-	})
+	i.Db.Raw("UPDATE users SET block_status=false where id=?", params).Scan(&user)
+	c.JSON(http.StatusOK, gin.H{"msg": "Unblocked succesfully"})
 }
