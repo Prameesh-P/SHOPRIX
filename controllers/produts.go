@@ -1,22 +1,24 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+	"path/filepath"
+	"strconv"
+
+	"github.com/Prameesh-P/SHOPRIX/database"
 	D "github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"path/filepath"
-	"strconv"
 )
 
 var Products []struct {
-	Product_ID  uint
+	ProductID   uint
 	ProductName string
 	ActualPrice uint
 	Price       string
 	Image       string
-	SubPic1     string
-	SubPic2     string
 	Description string
 	Color       string
 	Brands      string
@@ -69,6 +71,25 @@ func ListAllCategory(c *gin.Context) {
 		"available sizes":      shoesizes,
 	})
 }
+func ApplyDiscount(c *gin.Context) {
+	var brand struct {
+		Brand_id uint
+		Discount uint
+	}
+	if err := c.ShouldBindJSON(&brand); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+	}
+	record := database.Db.Model(&models.Brand{}).Where("id=?", brand.Brand_id).Update("discount", brand.Discount)
+	if record.Error == nil {
+		c.JSON(200, gin.H{
+			"discount": brand.Discount,
+			"msg":      "Brand discount added succesfully",
+		})
+
+	}
+}
 func ProductAdding(c *gin.Context) {
 	prodname := c.PostForm("productname")
 	price := c.PostForm("price")
@@ -90,17 +111,68 @@ func ProductAdding(c *gin.Context) {
 	image := uuid.New().String() + extension
 	c.SaveUploadedFile(imagepath, "./public/images"+image)
 
-	subpic1, _ := c.FormFile("subpic1")
-	extension = filepath.Ext(subpic1.Filename)
-	subpic11 := uuid.New().String() + extension
-	c.SaveUploadedFile(subpic1, "./public/images"+image)
-
-	subpic2path, _ := c.FormFile("subpic2")
-	extension = filepath.Ext(subpic2path.Filename)
-	subpic2 := uuid.New().String() + extension
-	c.SaveUploadedFile(subpic2path, "./public/images"+image)
 	discont := c.PostForm("discount")
 	discount, _ := strconv.Atoi(discont)
 	BrandDiscount := c.PostForm("BrandDiscount")
 	brandDiscount, _ := strconv.Atoi(BrandDiscount)
+	var Discount int
+	//inserting brand discount on to the products
+	insert := database.Db.Raw("update brands set discount=? where id=?", brandDiscount, brands).Scan(&models.Brand{})
+	if insert.Error != nil {
+		c.JSON(404, gin.H{
+			"err": insert.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	//comparing whcih type of discount is greater
+	if brandDiscount > discount {
+		Discount = (Price * brandDiscount) / 100
+
+	} else {
+		Discount = (Price * discount) / 100
+	}
+
+	// Discount = (Price * discount) / 100
+	var count uint
+	database.Db.Raw("select count(*) from products where product_name=?", prodname).Scan(&count)
+	fmt.Println(count)
+	if count > 0 {
+		c.JSON(404, gin.H{
+			"msg": "A product with same name already exists",
+		})
+		c.Abort()
+		return
+	}
+	product := models.Product{
+
+		ProductName: prodname,
+
+		Price:       uint(Price) - uint(Discount),
+		Color:       color,
+		Description: description,
+		ActualPrice: uint(Price),
+		Discount:    uint(discount),
+
+		BrandId:    uint(brands),
+		CategoryID: uint(catogoryy),
+		ShoeSizeID: uint(Size),
+		Image:      image,
+
+		Stock: uint(Stock),
+	}
+
+	record := database.Db.Create(&product)
+	if record.Error != nil {
+		c.JSON(404, gin.H{
+			"msg": "product already exists",
+		})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"msg": "added succesfully",
+	})
+
 }

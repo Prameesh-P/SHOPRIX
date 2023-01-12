@@ -52,29 +52,25 @@ type Otp struct {
 	Otp    string
 }
 type Product struct {
-	Product_id   uint   `json:"product_id" gorm:"primaryKey" `
-	Product_name string `json:"product_name" gorm:"not null"  `
-	Price        uint   `json:"price" gorm:"not null"  `
-	Actual_Price uint   `json:"actual_price" gorm:"not null"`
-	Image        string `json:"image" gorm:"not null"  `
-	Cover        string `json:"cover"   `
-	SubPic1      string `json:"subpic1"  `
-	SubPic2      string `json:"subpic2"  `
-	Stock        uint   `json:"stock"  `
-	Color        string `json:"color" gorm:"not null"  `
-	Description  string `json:"description"   `
-	Discount     uint   `json:"discount"`
-
-	Brand      Brand
-	Brand_id   uint `json:"brand_id" `
-	Cart       Cart
-	Cart_id    uint `json:"cart_id" `
-	Catogory   Category
-	CatogoryID uint
-	ShoeSize   ShoeSize
-	ShoeSizeID uint
-	WishList   WishList
-	WishListID uint
+	ProductId   uint   `json:"product_id" gorm:"primaryKey" `
+	ProductName string `json:"product_name" gorm:"not null"  `
+	Price       uint   `json:"price" gorm:"not null"  `
+	ActualPrice uint   `json:"actual_price" gorm:"not null"`
+	Image       string `json:"image" gorm:"not null"  `
+	Stock       uint   `json:"stock"  `
+	Color       string `json:"color" gorm:"not null"  `
+	Description string `json:"description"   `
+	Brand       Brand
+	BrandId     uint `json:"brand_id" `
+	Cart        Cart
+	CartId      uint `json:"cart_id" `
+	Category    Category
+	CategoryID  uint
+	ShoeSize    ShoeSize
+	ShoeSizeID  uint
+	WishList    WishList
+	WishListID  uint
+	Discount    uint
 }
 type Brand struct {
 	ID       uint   `json:"id" gorm:"primaryKey"  `
@@ -90,7 +86,7 @@ type ShoeSize struct {
 	Size uint `json:"size"`
 }
 type Cart struct {
-	Cart_id     uint `json:"cart_id" gorm:"primaryKey"  `
+	CartId      uint `json:"cart_id" gorm:"primaryKey"  `
 	UserId      uint `json:"user_id"   `
 	ProductID   uint `json:"product_id"  `
 	Quantity    uint `json:"quantity" `

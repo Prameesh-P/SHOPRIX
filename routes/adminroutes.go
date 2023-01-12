@@ -15,5 +15,6 @@ func AdminRoutes(routes *gin.Engine) {
 	admin.GET("/userdata", middlewares.AdminAuth(), c.UserData)
 	admin.PUT("/userdata/block/:id", middlewares.AdminAuth(), c.BlockUser)
 	admin.PUT("/userdata/unblock/:id", middlewares.AdminAuth(), c.UnBlockUser)
-
+	admin.GET("/getcategory", middlewares.AdminAuth(), c.ListAllCategory)
+	admin.POST("/addproducts", middlewares.AdminAuth(), c.ProductAdding)
 }
