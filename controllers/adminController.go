@@ -107,11 +107,10 @@ type UserDataStruct struct {
 
 func UserData(c *gin.Context) {
 	var user UserDataStruct
-	i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users ORDER BY id ASC").Scan(&user)
+	//i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users ORDER BY id ASC").Scan(&user)
 	if search := c.Query("search"); search != "" {
 		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users where first_name like ? ORDER BY id ASC ", search).Scan(&user)
 	}
-
 	c.JSON(200, gin.H{"user": user})
 }
 func BlockUser(c *gin.Context) {
