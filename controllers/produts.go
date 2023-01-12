@@ -176,3 +176,40 @@ func ProductAdding(c *gin.Context) {
 	})
 
 }
+
+type EditProductsData struct {
+	ProductName string `json:"productName"`
+	Price       uint   `json:"price"`
+	Image       string `json:"image"`
+	Color       string `json:"color"`
+}
+
+func EditProducts(c *gin.Context) {
+	params := c.Param("id")
+	var editProduct models.Product
+	if err := c.ShouldBindJSON(&editProduct); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	imagePath, _ := c.FormFile("image")
+	extension := filepath.Ext(imagePath.Filename)
+	image := uuid.New().String() + extension
+	c.SaveUploadedFile(imagePath, "./public/images"+image)
+	editProduct.Image = image
+	record := database.Db.Model(Products).Where("product_id=?", params).Updates(models.Product{ProductName: editProduct.ProductName, Price: editProduct.Price,
+		Image: editProduct.Image, Color: editProduct.Color})
+	if record.Error != nil {
+		c.JSON(404, gin.H{
+			"error": record.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "Edit product successfully..!!!",
+	})
+
+}
