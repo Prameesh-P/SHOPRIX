@@ -21,21 +21,21 @@ func init() {
 var (
 	accountSid string
 	authToken  string
-	fromPhone  string
+	serviceSid string
 	client     *twilio.RestClient
 )
 
 func OtpLog(c *gin.Context) {
 	accountSid = os.Getenv("ACCOUNT_SID")
 	authToken = os.Getenv("AUTH_TOKEN")
-	fromPhone = os.Getenv("FROM_PHONE")
+	serviceSid = os.Getenv("FROM_PHONE")
 	client = twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: accountSid,
 		Password: authToken,
 	})
 	Mob := c.Query("number")
 	result := CheckNumber(Mob)
-	fmt.Println(result)
+
 	if !result {
 		c.JSON(400, gin.H{
 			"status": "false",
@@ -44,10 +44,11 @@ func OtpLog(c *gin.Context) {
 		return
 	}
 	Mobile := "+91" + Mob
+	fmt.Println(Mobile)
 	params := &verify.CreateVerificationParams{}
 	params.SetTo(Mobile)
 	params.SetChannel("sms")
-	response, err := client.VerifyV2.CreateVerification(fromPhone, params)
+	response, err := client.VerifyV2.CreateVerification(serviceSid, params)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(400, gin.H{
@@ -70,23 +71,23 @@ func CheckNumber(str string) bool {
 func CheckOTP(c *gin.Context) {
 	accountSid = os.Getenv("ACCOUNT_SID")
 	authToken = os.Getenv("AUTH_TOKEN")
-	fromPhone = os.Getenv("FROM_PHONE")
+	serviceSid = os.Getenv("FROM_PHONE")
 	client = twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: accountSid,
 		Password: authToken,
 	})
 	Mob := c.Query("number")
-	code := c.Query("otps")
+	code := c.Query("otp")
 	CheckNumber(Mob)
 	var user models.User
 	database.Db.First(&user, "phone=?", Mob)
 	mobile := "+91" + Mob
-	fromPhone = os.Getenv("FROM_PHONE")
+	serviceSid = os.Getenv("FROM_PHONE")
 	fmt.Println(mobile)
 	params := &verify.CreateVerificationCheckParams{}
 	params.SetTo(mobile)
 	params.SetCode(code)
-	resp, err := client.VerifyV2.CreateVerificationCheck(fromPhone, params)
+	resp, err := client.VerifyV2.CreateVerificationCheck(serviceSid, params)
 
 	if err != nil {
 		fmt.Println(err.Error())
