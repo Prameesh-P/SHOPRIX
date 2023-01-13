@@ -70,8 +70,8 @@ func ListAllCategory(c *gin.Context) {
 }
 func ApplyDiscount(c *gin.Context) {
 	var brand struct {
-		Brand_id uint
-		Discount uint
+		Brand_id uint `json:"brand_id"`
+		Discount uint `json:"discount"`
 	}
 	if err := c.ShouldBindJSON(&brand); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -202,4 +202,26 @@ func EditProducts(c *gin.Context) {
 		"msg": "Edit product successfully..!!!",
 	})
 
+}
+func DeleteProductById(c *gin.Context) { //admin
+	params := c.Param("id")
+	var products models.Product
+	var count uint
+	database.Db.Raw("select count(product_id) from products where product_id=?", params).Scan(&count)
+	if count <= 0 {
+		c.JSON(404, gin.H{
+			"msg": "product doesnot exist",
+		})
+		c.Abort()
+		return
+	}
+
+	record := database.Db.Raw("delete from products where product_id=?", params).Scan(&products)
+	if record.Error != nil {
+		c.JSON(404, gin.H{"error": record.Error.Error()})
+		c.Abort()
+		return
+	}
+
+	c.JSON(200, gin.H{"msg": "deleted successfully"})
 }
