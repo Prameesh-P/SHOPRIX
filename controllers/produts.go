@@ -2,27 +2,27 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
-	"path/filepath"
-	"strconv"
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"net/http"
+	"path/filepath"
+	"strconv"
 )
 
 var Products []struct {
-	Product_ID   uint
-	Product_Name string
-	Actual_price uint
-	Price        string
-	Image        string
-	Description  string
-	Color        string
-	Brands       string
-	Stock        uint
-	Catogory     string
-	Size         uint
+	ProductID   uint
+	ProductName string
+	ActualPrice uint
+	Price       string
+	Image       string
+	Description string
+	Color       string
+	Brands      string
+	Stock       uint
+	Category    string
+	Size        uint
 }
 
 func ListAllCategory(c *gin.Context) {
@@ -88,7 +88,7 @@ func ApplyDiscount(c *gin.Context) {
 	}
 }
 func ProductAdding(c *gin.Context) {
-	
+
 	prodname := c.Request.FormValue("productname")
 	price := c.Request.FormValue("price")
 	Price, _ := strconv.Atoi(price)
@@ -101,7 +101,7 @@ func ProductAdding(c *gin.Context) {
 	catogory := c.Request.FormValue("catogoryID")
 	catogoryy, _ := strconv.Atoi(catogory)
 	size := c.Request.FormValue("sizeID")
-	
+
 	Size, _ := strconv.Atoi(size)
 	// images adding
 	imagepath, _ := c.FormFile("image")
@@ -147,11 +147,11 @@ func ProductAdding(c *gin.Context) {
 		Description: description,
 		ActualPrice: uint(Price) - uint(Discount),
 		Discount:    uint(Discount),
-		BrandId:    uint(brands),
-		CategoryID: uint(catogoryy),
-		ShoeSizeID: uint(Size),
-		Image: image,
-		Stock: uint(Stock),
+		BrandId:     uint(brands),
+		CategoryID:  uint(catogoryy),
+		ShoeSizeID:  uint(Size),
+		Image:       image,
+		Stock:       uint(Stock),
 	}
 	record := database.Db.Create(&product)
 	if record.Error != nil {
@@ -174,33 +174,23 @@ type EditProductsData struct {
 	Color       string `json:"color"`
 }
 
-func EditProducts(c *gin.Context) {
-	param := c.Request.FormValue("id")
-	Params,_:=strconv.Atoi(param)
-	params:=uint(Params)
-	var edit EditProductsData
-	edit.ProductName = c.Request.FormValue("productname")
-	editprice := c.Request.FormValue("price")
-	edit_price,_:=strconv.Atoi(editprice)
-	edit.Price=uint(edit_price)
-	edit.Color = c.Request.FormValue("color")
-	imagePath, _ := c.FormFile("image")
-	extension := filepath.Ext(imagePath.Filename)
-	image := uuid.New().String() + extension
-	c.SaveUploadedFile(imagePath, "./public/images"+image)
-	edit.Image = image
-	record := database.Db.Model(Products).Where("product_id=?", params).Updates(models.Product{ProductName: edit.ProductName, Price: edit.Price,
-		Image: edit.Image, Color: edit.Color})
-	if record.Error != nil {
-		c.JSON(404, gin.H{
-			"error": record.Error.Error(),
-		})
+func EditProducts(c *gin.Context) { //admin
+	params := c.Param("id")
+	var editProducts EditProductsData
+	if err := c.ShouldBindJSON(&editProducts); err != nil {
+		c.JSON(404, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "Edit product successfully..!!!",
-	})
+	var products models.Product
+	record := database.Db.Model(products).Where("product_id=?", params).Updates(models.Product{ProductName: editProducts.ProductName,
+		Price: editProducts.Price, Color: editProducts.Color})
+	if record.Error != nil {
+		c.JSON(404, gin.H{"error": record.Error.Error()})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{"msg": "updated successfully"})
 
 }
 func DeleteProductById(c *gin.Context) { //admin
