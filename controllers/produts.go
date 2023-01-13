@@ -30,7 +30,7 @@ func ListAllCategory(c *gin.Context) {
 	var categorys models.Category
 	var shoesizes models.ShoeSize
 	brand := database.Db.Find(&brandss)
-	if brandSearch := c.Query("brandsearch"); brandSearch != "" {
+	if brandSearch := c.Request.FormValue("brandsearch"); brandSearch != "" {
 		if brand.Error != nil {
 			c.JSON(400, gin.H{
 				"error": brand.Error.Error(),
@@ -41,8 +41,7 @@ func ListAllCategory(c *gin.Context) {
 	}
 	category := database.Db.Find(&categorys)
 	if categorySearch := c.Query("categorysearch"); categorySearch != "" {
-		category = database.Db.Where("category LIKE=?", "%"+categorySearch+"%").Find(&categorys)
-
+		category = database.Db.Where("category LIKE=?", categorySearch).Find(&categorys)
 		if category.Error != nil {
 			c.JSON(404, gin.H{
 				"err": category.Error.Error(),
@@ -127,11 +126,9 @@ func ProductAdding(c *gin.Context) {
 	// comparing whcih type of discount is greater
 	if brandDiscount > discount {
 		Discount = (Price * brandDiscount) / 100
-	
 	} else {
 		Discount = (Price * discount) / 100
 	}
-	// Discount = (Price * discount) / 100
 	var count uint
 	database.Db.Raw("select count(*) from products where product_name=?", prodname).Scan(&count)
 	fmt.Println(count)
@@ -148,7 +145,7 @@ func ProductAdding(c *gin.Context) {
 		Price:       uint(Price),
 		Color:       color,
 		Description: description,
-		ActualPrice: uint(Price),
+		ActualPrice: uint(Price) - uint(Discount),
 		Discount:    uint(Discount),
 		BrandId:    uint(brands),
 		CategoryID: uint(catogoryy),
@@ -178,16 +175,10 @@ type EditProductsData struct {
 }
 
 func EditProducts(c *gin.Context) {
-	params := c.Param("id")
+	param := c.Request.FormValue("id")
+	Params,_:=strconv.Atoi(param)
+	params:=uint(Params)
 	var edit EditProductsData
-	// var editProduct models.Product
-	// if err := c.ShouldBindJSON(&editProduct); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": err.Error(),
-	// 	})
-	// 	c.Abort()
-	// 	return
-	// }
 	edit.ProductName = c.Request.FormValue("productname")
 	editprice := c.Request.FormValue("price")
 	edit_price,_:=strconv.Atoi(editprice)
@@ -198,7 +189,7 @@ func EditProducts(c *gin.Context) {
 	image := uuid.New().String() + extension
 	c.SaveUploadedFile(imagePath, "./public/images"+image)
 	edit.Image = image
-	record := database.Db.Model(Products).Where("id=?", params).Updates(models.Product{ProductName: edit.ProductName, Price: edit.Price,
+	record := database.Db.Model(Products).Where("product_id=?", params).Updates(models.Product{ProductName: edit.ProductName, Price: edit.Price,
 		Image: edit.Image, Color: edit.Color})
 	if record.Error != nil {
 		c.JSON(404, gin.H{
