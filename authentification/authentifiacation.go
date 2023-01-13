@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"os"
+
 	"time"
 )
 
@@ -68,3 +69,4 @@ func ValidateToken(signedToken string) (err error) {
 	}
 	return
 }
+

@@ -18,4 +18,5 @@ func UserRoutes(routes *gin.Engine) {
 	routes.GET("/validate", middlewares.UserAuth(), c.Validate)
 	routes.POST("/login/otp", c.OtpLog)
 	routes.POST("/login/otpvalidate", c.CheckOTP)
+	routes.GET("/logout", middlewares.AdminAuth())
 }

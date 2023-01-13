@@ -111,7 +111,7 @@ func UserHome(c *gin.Context) {
 }
 func ForgetPassword(c *gin.Context) {
 	var user models.User
-	UserEmail := c.GetString("user")
+	UserEmail := c.PostForm("user")
 	NewPassword := c.PostForm("password")
 	database.Db.Raw("select password,id from users where email=?", UserEmail).Scan(&user)
 	// user.Password=NewPassword
@@ -122,9 +122,8 @@ func ForgetPassword(c *gin.Context) {
 	}
 	fmt.Println(user.HashPassword(NewPassword))
 
-	database.Db.Raw("update users set password=? where id=?", user.Password, user.ID).Scan(&user)
+	database.Db.Raw("update users set password=? where email=?", user.Password, UserEmail).Scan(&user)
 	fmt.Println(UserEmail)
-
 	fmt.Println(NewPassword)
 	c.JSON(200, gin.H{
 		"pass":  NewPassword,

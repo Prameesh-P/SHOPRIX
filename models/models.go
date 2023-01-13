@@ -52,7 +52,8 @@ type Otp struct {
 	Otp    string
 }
 type Product struct {
-	ProductId   uint   `json:"product_id" gorm:"primaryKey" `
+	gorm.Model
+	ProductId   uint   `json:"product_id" gorm:"primaryKey;not_null;autoIncrement" `
 	ProductName string `json:"product_name" gorm:"not null"  `
 	Price       uint   `json:"price" gorm:"not null"  `
 	ActualPrice uint   `json:"actual_price" gorm:"not null"`
@@ -68,8 +69,8 @@ type Product struct {
 	CategoryID  uint
 	ShoeSize    ShoeSize
 	ShoeSizeID  uint
-	WishList    WishList
-	WishListID  uint
+	// WishList    WishList
+	// WishListID  uint
 	Discount    uint
 }
 type Brand struct {

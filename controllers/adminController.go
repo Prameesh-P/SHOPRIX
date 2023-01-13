@@ -91,9 +91,23 @@ func AdminLogin(c *gin.Context) {
 		"tokenString": tokenString,
 	})
 }
+
 func AdminHome(c *gin.Context) {
 	c.JSON(202, gin.H{
 		"status": "Welcome to admin home page ",
+	})
+}
+func LogoutUser(c *gin.Context) {
+
+	token := c.GetHeader("access_token")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"status": http.StatusUnauthorized, "message": "Authorization Token is required"})
+		c.Abort()
+		return
+	}
+	c.SetCookie("AdminJWT", token, 0, "", "", false, true)
+	c.JSON(200, gin.H{
+		"success": "logout successfully",
 	})
 }
 
