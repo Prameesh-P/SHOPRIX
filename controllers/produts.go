@@ -29,8 +29,8 @@ func ListAllCategory(c *gin.Context) {
 	var brandss models.Brand
 	var categorys models.Category
 	var shoesizes models.ShoeSize
-	brand := database.Db.Find(&brandss)
-	if brandSearch := c.Request.FormValue("brandsearch"); brandSearch != "" {
+	if brandSearch := c.Query("brandsearch"); brandSearch != "" {
+		brand:=database.Db.Raw("SElECT * FROM brands WHERE brands=?",brandSearch).Scan(&brandss)
 		if brand.Error != nil {
 			c.JSON(400, gin.H{
 				"error": brand.Error.Error(),
@@ -39,9 +39,8 @@ func ListAllCategory(c *gin.Context) {
 			return
 		}
 	}
-	category := database.Db.Find(&categorys)
 	if categorySearch := c.Query("categorysearch"); categorySearch != "" {
-		category = database.Db.Where("category LIKE=?", categorySearch).Find(&categorys)
+		category:= database.Db.Raw("SElECT * FROM categories WHERE Category=?",categorySearch).Scan(&categorys)
 		if category.Error != nil {
 			c.JSON(404, gin.H{
 				"err": category.Error.Error(),
@@ -50,10 +49,10 @@ func ListAllCategory(c *gin.Context) {
 			return
 		}
 	}
-	size := database.Db.Find(&shoesizes)
 	if sizeSearch := c.Query("sizesearch"); sizeSearch != "" {
-		sizes, _ := strconv.Atoi(sizeSearch)
-		size = database.Db.Where("size = ?", sizes).Find(&shoesizes)
+		Sizes, _ := strconv.Atoi(sizeSearch)
+		sizes:=uint(Sizes)
+		size:= database.Db.Raw("SElECT * FROM shoe_sizes WHERE size=?",sizes).Scan(&shoesizes)
 		if size.Error != nil {
 			c.JSON(404, gin.H{
 				"err": size.Error.Error(),
@@ -101,14 +100,12 @@ func ProductAdding(c *gin.Context) {
 	catogory := c.Request.FormValue("catogoryID")
 	catogoryy, _ := strconv.Atoi(catogory)
 	size := c.Request.FormValue("sizeID")
-
 	Size, _ := strconv.Atoi(size)
 	// images adding
 	imagepath, _ := c.FormFile("image")
 	extension := filepath.Ext(imagepath.Filename)
 	image := uuid.New().String() + extension
 	c.SaveUploadedFile(imagepath, "./public/images"+image)
-
 	discont := c.Request.FormValue("discount")
 	discount, _ := strconv.Atoi(discont)
 	BrandDiscount := c.Request.FormValue("BrandDiscount")
@@ -214,4 +211,31 @@ func DeleteProductById(c *gin.Context) { //admin
 	}
 
 	c.JSON(200, gin.H{"msg": "deleted successfully"})
+}
+func GetProductByID(c *gin.Context) { //user
+	params := c.Param("id")
+	// var product models.Product
+	record := database.Db.Raw("SELECT product_id,product_name,price,image,color,stock,brands.brands FROM products join brands on products.brand_id = brands.id where product_id=?", params).Scan(&Products)
+	if record.Error != nil {
+		c.JSON(404, gin.H{"err": record.Error.Error()})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{"product": Products})
+
+}
+func ProductView(c *gin.Context){
+	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
+	fmt.Println(record)
+
+	if s := c.Query("search"); s != "" { //search
+		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id where product_name like ?", "%"+s+"%").Scan(&Products)
+
+	}
+	if sort := c.Query("sort"); sort != "" { //sort
+		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id  order by price ?", sort).Scan(&Products)
+	}
+	c.JSON(200, gin.H{
+		"products": Products,
+	})
 }

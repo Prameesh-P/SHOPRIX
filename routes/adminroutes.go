@@ -20,4 +20,6 @@ func AdminRoutes(routes *gin.Engine) {
 	admin.POST("/addproducts", middlewares.AdminAuth(), c.ProductAdding)
 	admin.POST("/editproducts/:id", middlewares.AdminAuth(), c.EditProducts)
 	admin.DELETE("/deleteproducts/:id", middlewares.AdminAuth(), c.DeleteProductById)
+	admin.GET("/productsbyid/:id",middlewares.AdminAuth(),c.GetProductByID)
+	admin.GET("/productview",middlewares.AdminAuth(),c.ProductView)
 }
