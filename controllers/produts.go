@@ -222,16 +222,13 @@ func GetProductByID(c *gin.Context) { //user
 		return
 	}
 	c.JSON(200, gin.H{"product": Products})
-
 }
 
 func ProductView(c *gin.Context){
 	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
 	fmt.Println(record)
-
 	if s := c.Query("search"); s != "" { //search
 		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id where product_name like ?", "%"+s+"%").Scan(&Products)
-
 	}
 	if sort := c.Query("sort"); sort != "" { //sort
 		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id  order by price ?", sort).Scan(&Products)

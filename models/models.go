@@ -13,6 +13,9 @@ type User struct {
 	Password     string `json:"password" validate:"required,min=6"`
 	Phone        string `json:"phone"  validate:"required"`
 	BlockStatus  bool   `json:"block_Status" `
+	Country  	 string `json:"country"`
+	City 		 string `json:"city"`
+	Pincode      string `json:"pincode"`
 	Token        string `json:"token"`
 	RefreshToken string `json:"referesh_token" `
 }
