@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"net/http"
+	"net/smtp"
 	"os"
 	"time"
 
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -108,6 +109,39 @@ func UserHome(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"success": "Welcome to user home page..!!",
 	})
+}
+func ForgetPasswordEmail(c *gin.Context) {
+	// var user models.User
+	params:=c.Param("email")
+	// var user models.User
+	from := "prameepramee0@gmail.com"
+	to := []string{params}
+	msg := []byte("To:\r"+params+"\nFrom:"+"prameepramee0@gmail.com"+"\nSubject:Forget password request..!!!!\r\n"+"This is Email verification sent from SHOPRIX ECOMMERCE PLATFROM.\r\n"+"Please click on the link\r\n"+``)
+	status := SentToEmail(from, to, msg)
+	if status {
+		c.JSON(http.StatusAccepted, gin.H{
+			"Success": "true",
+			"msg":     "Verification sent on email successfully",
+		})
+	} else {
+		c.JSON(404, gin.H{
+			"error": "something went wrong",
+		})
+		c.Abort()
+		return
+	}
+
+}
+func SentToEmail(from string, to []string, msg []byte) bool {
+	auth := smtp.PlainAuth("", from, os.Getenv("SMT_PASSWORD"), os.Getenv("SMT_HOST"))
+	smtpAddress := fmt.Sprintf("%s:%v", os.Getenv("SMT_HOST"), os.Getenv("SMT_PORT"))
+	err := smtp.SendMail(smtpAddress, auth, from, to, msg)
+	if err != nil {
+		return false
+	}else{
+	return true
+	}
+
 }
 func ForgetPassword(c *gin.Context) {
 	var user models.User

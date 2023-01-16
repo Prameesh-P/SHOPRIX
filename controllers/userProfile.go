@@ -28,14 +28,11 @@ func UserProfileGet(c *gin.Context) {
 } 	
 func AddUserAddress(c *gin.Context)  {
 	var user models.User
-	FirstName:=c.PostForm("first_name")
-	LastName:=c.PostForm("last_name")
-	Phone:=c.PostForm("phone")
-	email:=c.PostForm("email")
 	country:=c.PostForm("country")
 	City:=c.PostForm("city")
 	pincode:=c.PostForm("pincode")
-	query:=database.Db.Raw("update users set fisrt_name=?,last_name,email=?,phone=?,country=?,city=?,piccode=?",FirstName,LastName,email,Phone,country,City,pincode).Scan(&user)
+	landmark:=c.PostForm("landmark")
+	query:=database.Db.Raw("update users set country=?,city=?,piccode=?,landmark=?",country,City,pincode,landmark).Scan(&user)
 	if query.Error != nil {
 		c.JSON(404,gin.H{
 			"err":query.Error.Error(),

@@ -16,8 +16,8 @@ type User struct {
 	Country  	 string `json:"country"`
 	City 		 string `json:"city"`
 	Pincode      string `json:"pincode"`
-	Token        string `json:"token"`
-	RefreshToken string `json:"referesh_token" `
+	LandMark	 string `json:"landmark"`
+	
 }
 type Admin struct {
 	gorm.Model

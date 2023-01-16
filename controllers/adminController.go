@@ -63,7 +63,7 @@ func AdminLogin(c *gin.Context) {
 	if admins.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",
-		})
+		})	
 		return
 	}
 	err := admins.CheckPassword(admin.Password)
