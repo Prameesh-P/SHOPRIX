@@ -224,6 +224,7 @@ func GetProductByID(c *gin.Context) { //user
 	c.JSON(200, gin.H{"product": Products})
 
 }
+
 func ProductView(c *gin.Context){
 	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
 	fmt.Println(record)
