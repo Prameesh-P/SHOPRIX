@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
@@ -26,7 +27,7 @@ func UserProfileGet(c *gin.Context) {
 		"profile":profile,
 	})
 } 	
-func AddUserAddress(c *gin.Context)  {
+func AddUserAddressOnUserMedel(c *gin.Context)  {
 	var user models.User
 	country:=c.PostForm("country")
 	City:=c.PostForm("city")
@@ -42,5 +43,42 @@ func AddUserAddress(c *gin.Context)  {
 	}
 	c.JSON(http.StatusOK,gin.H{
 		"success":"update successfully",
+	})
+}
+func AddAddress(c *gin.Context){
+	var user models.User
+	userEmail:=c.GetString("email")
+	database.Db.Raw("select id from users where email=?",userEmail).Scan(&user)
+	
+	Name := c.GetString("name")
+	Phonenum := c.GetString("phonenumber")
+	phonenums, _ := strconv.Atoi(Phonenum)
+	pincod := c.GetString("pincode")
+	pincode, _ := strconv.Atoi(pincod)
+	area := c.GetString("area")
+	houseadd := c.GetString("house")
+	landmark := c.GetString("landmark")
+	city := c.GetString("city")
+
+	address:=models.Address{
+		UserID: user.ID,
+		Name: Name,
+		PhoneNum: uint(phonenums),
+		Pincode: uint(pincode),
+		Area: area,
+		House: houseadd,
+		LandMark: landmark,
+		City: city,
+	}
+	record:=database.Db.Create(&address)
+	if record.Error !=nil {
+		c.JSON(404,gin.H{
+			"error":record.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200,gin.H{
+		"msg":"Address Added",
 	})
 }

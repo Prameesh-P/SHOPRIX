@@ -19,6 +19,16 @@ type User struct {
 	LandMark	 string `json:"landmark"`
 	
 }
+type Address struct{
+	UserID 		uint   `json:"user_id"`
+	Name 		string `json:"name"`
+	PhoneNum 	uint   `json:"phone_name"`
+	Pincode 	uint   `json:"pincode"`
+	Area		string `json:"area"`
+	House		string `json:"house"`
+	LandMark    string `json:"land_mark"`
+	City		string `json:"city"`
+}
 type Admin struct {
 	gorm.Model
 	Email    string `json:"email" validate:"required,min=5,max=100"`
