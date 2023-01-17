@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"net/smtp"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Prameesh-P/SHOPRIX/database"
@@ -110,13 +112,32 @@ func UserHome(c *gin.Context) {
 		"success": "Welcome to user home page..!!",
 	})
 }
+var OTP struct{
+	Number string
+}
+func OtpGenerator()string{
+	min:=1257
+	max:=9871
+	rand.Seed(time.Now().UnixNano())
+	otp:=rand.Intn(max-min)+min
+	otps:=strconv.Itoa(otp)
+	OTP.Number=otps
+	return otps
+}
+
 func ForgetPasswordEmail(c *gin.Context) {
+	otps:=OtpGenerator()
 	// var user models.User
 	params:=c.Param("email")
 	// var user models.User
 	from := "prameepramee0@gmail.com"
 	to := []string{params}
-	msg := []byte("To:\r"+params+"\nFrom:"+"prameepramee0@gmail.com"+"\nSubject:Forget password request..!!!!\r\n"+"This is Email verification sent from SHOPRIX ECOMMERCE PLATFROM.\r\n"+"Please click on the link\r\n"+``)
+  	msg := []byte("To:"+params+"\r\n" +
+	"From:prameepramee0@gmail.com\r\n" +
+	"Subject: SHOPRIX verification!\r\n" +
+	"\r\n" +
+	"<html>This is the email is sent using golang and sendinblue.</html>\r\n"+"<html><h1 style="+"color:red>"+otps+"</h1></html>")
+
 	status := SentToEmail(from, to, msg)
 	if status {
 		c.JSON(http.StatusAccepted, gin.H{
@@ -130,7 +151,6 @@ func ForgetPasswordEmail(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
 }
 func SentToEmail(from string, to []string, msg []byte) bool {
 	auth := smtp.PlainAuth("", from, os.Getenv("SMT_PASSWORD"), os.Getenv("SMT_HOST"))
@@ -144,25 +164,62 @@ func SentToEmail(from string, to []string, msg []byte) bool {
 
 }
 func ForgetPassword(c *gin.Context) {
+	UserEmail:=c.Request.FormValue("useremail")
+
 	var user models.User
-	UserEmail := c.PostForm("user")
-	NewPassword := c.PostForm("password")
-	database.Db.Raw("select password,id from users where email=?", UserEmail).Scan(&user)
+	var count uint
+	Userotp := c.Request.FormValue("user")
+	UserOtps,_:=strconv.Atoi(Userotp)
+	Otp:=OTP.Number
+	Otps,_:=strconv.Atoi(Otp)
+	fmt.Println(Otps)
+	fmt.Println(UserOtps)
+	NewPassword := c.Request.FormValue("password")
+	database.Db.Raw("select count(*) from users where email=?", UserEmail).Scan(&count)
 	// user.Password=NewPassword
+	if count<=0 {
+		c.JSON(http.StatusBadRequest,gin.H{
+			"error":"sorry we cant find no user with this email..!!",
+		})
+		c.Abort()
+		return
+	}
+	if user.BlockStatus {
+		c.JSON(http.StatusBadRequest,gin.H{
+			"error":"Sorry you are blocked by admin",
+		})
+		c.Abort()
+		return
+	}
 	if err := user.HashPassword(NewPassword); err != nil {
 		c.JSON(404, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
 	fmt.Println(user.HashPassword(NewPassword))
-
-	database.Db.Raw("update users set password=? where email=?", user.Password, UserEmail).Scan(&user)
+	hash, err := bcrypt.GenerateFromPassword([]byte(NewPassword), 10)
+	if err!=nil {
+		c.JSON(404,gin.H{
+			"err":"failed to hash",
+		})
+		c.Abort()
+		return
+	}
+	database.Db.Raw("update users set password=? where email=?", hash, UserEmail).Scan(&user)
 	fmt.Println(UserEmail)
 	fmt.Println(NewPassword)
-	c.JSON(200, gin.H{
-		"pass":  NewPassword,
-		"email": UserEmail,
-	})
+	if Otps==UserOtps {
+		c.JSON(200,gin.H{
+			"success":"true",
+			"UserEmail":UserEmail,
+			"NewPassword":NewPassword,
+		})
+	}else{
+		c.JSON(404,gin.H{
+
+			"error":"error",
+		})
+	}
 
 }
 
@@ -174,7 +231,9 @@ func Validate(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": User,
+	c.JSON(200,gin.H{
+		"status":"true",
+		"user":User,
 	})
+	
 }
