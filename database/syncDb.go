@@ -11,5 +11,6 @@ func SyncDb() {
 		&models.Brand{},
 		&models.WishList{},
 		&models.Category{},
+		&models.Address{},
 	)
 }

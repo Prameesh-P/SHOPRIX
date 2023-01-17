@@ -20,6 +20,7 @@ type User struct {
 	
 }
 type Address struct{
+	Email 		string `json:"email"`
 	UserID 		uint   `json:"user_id"`
 	Name 		string `json:"name"`
 	PhoneNum 	uint   `json:"phone_name"`

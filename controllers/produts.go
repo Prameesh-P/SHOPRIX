@@ -167,7 +167,7 @@ func ProductAdding(c *gin.Context) {
 type EditProductsData struct {
 	ProductName string `json:"productName"`
 	Price       uint   `json:"price"`
-	Image       string `json:"image"`
+	Brand       string `json:"brand"`
 	Color       string `json:"color"`
 }
 

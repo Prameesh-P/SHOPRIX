@@ -10,30 +10,36 @@ import (
 )
 
 type Profile struct {
-	FirstName string
-	LastName  string
-	UserEmail string
-	Phone     string
-	Country   string
+	Name 	  string
+	PhoneNum  string
+	Area	  string
+	House     string
+	LandMark  string
 	City      string
 	Pincode   string
+	Email	  string
 }
 
 func UserProfileGet(c *gin.Context) {
-	userEmail:=c.GetString("user")
+	userEmail:=c.Request.FormValue("user")
 	var profile Profile
-	database.Db.Raw("select first_name,last_name,email,phone,country,city,pincode from users where email=?",userEmail).Scan(&profile)
+	database.Db.Raw("select name,phone_num,pincode,area,house,land_mark,city,email from addresses where email=?",userEmail).Scan(&profile)
 	c.JSON(http.StatusOK,gin.H{
 		"profile":profile,
 	})
 } 	
-func AddUserAddressOnUserMedel(c *gin.Context)  {
+func EditUserAddress(c *gin.Context)  {
 	var user models.User
-	country:=c.PostForm("country")
-	City:=c.PostForm("city")
-	pincode:=c.PostForm("pincode")
-	landmark:=c.PostForm("landmark")
-	query:=database.Db.Raw("update users set country=?,city=?,piccode=?,landmark=?",country,City,pincode,landmark).Scan(&user)
+	Name := c.Request.FormValue("name")
+	Phonenum := c.Request.FormValue("phonenumber")
+	phonenums, _ := strconv.Atoi(Phonenum)
+	pincod := c.PostForm("pincode")
+	pincode, _ := strconv.Atoi(pincod)
+	area := c.PostForm("area")
+	houseadd := c.PostForm("house")
+	landmark := c.PostForm("landmark")
+	city := c.Request.FormValue("city")
+	query:=database.Db.Raw("update addresses set name=?,phone_num=?,pincode=?,area=?,house=?,city=?,land_mark=?,",Name,phonenums,pincode,area,houseadd,city,landmark).Scan(&user)
 	if query.Error != nil {
 		c.JSON(404,gin.H{
 			"err":query.Error.Error(),
@@ -47,23 +53,23 @@ func AddUserAddressOnUserMedel(c *gin.Context)  {
 }
 func AddAddress(c *gin.Context){
 	var user models.User
-	userEmail:=c.GetString("email")
+	userEmail:=c.Request.FormValue("email")
 	database.Db.Raw("select id from users where email=?",userEmail).Scan(&user)
-	
-	Name := c.GetString("name")
-	Phonenum := c.GetString("phonenumber")
+	Name := c.Request.FormValue("name")
+	Phonenum := c.Request.FormValue("phonenumber")
 	phonenums, _ := strconv.Atoi(Phonenum)
-	pincod := c.GetString("pincode")
+	pincod := c.PostForm("pincode")
 	pincode, _ := strconv.Atoi(pincod)
-	area := c.GetString("area")
-	houseadd := c.GetString("house")
-	landmark := c.GetString("landmark")
-	city := c.GetString("city")
+	area := c.PostForm("area")
+	houseadd := c.PostForm("house")
+	landmark := c.PostForm("landmark")
+	city := c.Request.FormValue("city")
 
 	address:=models.Address{
 		UserID: user.ID,
 		Name: Name,
 		PhoneNum: uint(phonenums),
+		Email: userEmail,
 		Pincode: uint(pincode),
 		Area: area,
 		House: houseadd,

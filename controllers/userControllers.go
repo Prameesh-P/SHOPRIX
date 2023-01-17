@@ -25,7 +25,7 @@ func Signup(c *gin.Context) {
 		Phone       string
 		BlockStatus bool
 	}
-	if c.ShouldBind(&body) != nil {
+	if c.ShouldBindJSON(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "failed to read body",
 		})
@@ -146,7 +146,7 @@ func ForgetPasswordEmail(c *gin.Context) {
 		})
 	} else {
 		c.JSON(404, gin.H{
-			"error": "something went wrong",
+			"error": "Please check your Email..!!",
 		})
 		c.Abort()
 		return
@@ -168,7 +168,7 @@ func ForgetPassword(c *gin.Context) {
 
 	var user models.User
 	var count uint
-	Userotp := c.Request.FormValue("user")
+	Userotp := c.Request.FormValue("otp")
 	UserOtps,_:=strconv.Atoi(Userotp)
 	Otp:=OTP.Number
 	Otps,_:=strconv.Atoi(Otp)

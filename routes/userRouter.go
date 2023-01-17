@@ -11,6 +11,9 @@ func UserRoutes(routes *gin.Engine) {
 	user := routes.Group("/user")
 	{
 		user.GET("/", c.UserHome)
+		user.GET("/profile",c.UserProfileGet)
+		user.POST("/profile/edit",c.EditUserAddress)
+		user.POST("/profile/add",c.AddAddress)
 	}
 	routes.POST("/signup", c.Signup)
 	routes.POST("/login", c.Login)
