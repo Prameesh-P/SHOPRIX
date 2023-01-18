@@ -39,7 +39,7 @@ func EditUserAddress(c *gin.Context)  {
 	houseadd := c.PostForm("house")
 	landmark := c.PostForm("landmark")
 	city := c.Request.FormValue("city")
-	query:=database.Db.Raw("update addresses set name=?,phone_num=?,pincode=?,area=?,house=?,city=?,land_mark=?,",Name,phonenums,pincode,area,houseadd,city,landmark).Scan(&user)
+	query:=database.Db.Raw("update addresses set name=?,phone_num=?,pincode=?,area=?,house=?,city=?,land_mark=?",Name,phonenums,pincode,area,houseadd,city,landmark).Scan(&user)
 	if query.Error != nil {
 		c.JSON(404,gin.H{
 			"err":query.Error.Error(),

@@ -159,8 +159,10 @@ func SentToEmail(from string, to []string, msg []byte) bool {
 	if err != nil {
 		return false
 	}else{
+
 	return true
-	}
+	
+}
 
 }
 func ForgetPassword(c *gin.Context) {
