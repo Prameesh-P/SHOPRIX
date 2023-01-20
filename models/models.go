@@ -105,7 +105,7 @@ type Cart struct {
 	UserId      uint `json:"user_id"   `
 	ProductID   uint `json:"product_id"  `
 	Quantity    uint `json:"quantity" `
-	TotalPrice uint `json:"total_price"   `
+	TotalPrice uint  `json:"total_price"   `
 }
 type WishList struct {
 	gorm.Model
