@@ -9,8 +9,8 @@ func SyncDb() {
 		&models.ShoeSize{},
 		&models.Product{},
 		&models.Brand{},
-		&models.WishList{},
 		&models.Category{},
 		&models.Address{},
+		&models.Cart{},
 	)
 }
