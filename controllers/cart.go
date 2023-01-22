@@ -95,6 +95,7 @@ func Viewcart (c *gin.Context){
 		c.Abort()
 		return
 	}
+
 	var totalcartvalue uint
 
 	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalcartvalue)
@@ -102,4 +103,40 @@ func Viewcart (c *gin.Context){
 		"cart":  cart,
 		"total": totalcartvalue,
 	})
+}
+func CheckOutAddress (c *gin.Context){
+	useremail := c.GetString("user")
+	var user models.User
+	database.Db.Raw("select id from users where email=?", useremail).Scan(&user)
+
+	Name := c.PostForm("name")
+	Phonenum := c.PostForm("phone_number")
+	phonenum, _ := strconv.Atoi(Phonenum)
+	pincod := c.PostForm("pincode")
+	pincode, _ := strconv.Atoi(pincod)
+	area := c.PostForm("area")
+	houseadd := c.PostForm("house")
+	landmark := c.PostForm("landmark")
+	city := c.PostForm("city")
+	address:=models.Address{
+		UserID: user.ID,
+		Name: Name,
+		PhoneNum: uint(phonenum),
+		Pincode: uint(pincode),
+		Area: area,
+		House: houseadd,
+		LandMark: landmark,
+		City: city,
+	}
+	record:=database.Db.Create(&address)
+	if record.Error!=nil{
+		c.JSON(404,gin.H{
+			"err":record.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{
+		"msg":"Address added",
+	})	
 }
