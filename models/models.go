@@ -60,11 +60,6 @@ func (a *Admin) CheckPassword(incomingPass string) error {
 	return nil
 }
 
-type Otp struct {
-	gorm.Model
-	Mobile string
-	Otp    string
-}
 type Product struct {
 	gorm.Model
 	ProductId   uint   `json:"product_id" gorm:"primaryKey;not_null;autoIncrement" `
@@ -83,8 +78,6 @@ type Product struct {
 	CategoryID  uint
 	ShoeSize    ShoeSize
 	ShoeSizeID  uint
-	// WishList    WishList
-	// WishListID  uint
 	Discount    uint
 }
 type Brand struct {
@@ -107,8 +100,16 @@ type Cart struct {
 	Quantity    uint `json:"quantity" `
 	TotalPrice uint  `json:"total_price"   `
 }
-type WishList struct {
+// type WishList struct {
+// 	gorm.Model
+// 	UserID     uint
+// 	Product_id uint
+// }
+type Coupon struct {
 	gorm.Model
-	UserID     uint
-	Product_id uint
+
+	Coupon_Code string `json:"coupon_code"`
+	Discount    uint   `json:"discount"`
+	Quantity    uint   `json:"quantity"`
+	Validity    int64  `json:"validity"`
 }

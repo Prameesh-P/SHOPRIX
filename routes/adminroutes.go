@@ -22,4 +22,5 @@ func AdminRoutes(routes *gin.Engine) {
 	admin.DELETE("/deleteproducts/:id", middlewares.AdminAuth(), c.DeleteProductById)
 	admin.GET("/productsbyid/:id",middlewares.AdminAuth(),c.GetProductByID)
 	admin.GET("/productview",middlewares.AdminAuth(),c.ProductView)
+	admin.POST("/generate-coupens",middlewares.AdminAuth(),c.GenerateCoupens)
 }
