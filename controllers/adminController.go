@@ -63,7 +63,7 @@ func AdminLogin(c *gin.Context) {
 	if admins.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",
-		})	
+		})
 		return
 	}
 	err := admins.CheckPassword(admin.Password)
@@ -131,11 +131,11 @@ func BlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User
 	i.Db.Raw("UPDATE users SET block_status=true where id=?", params).Scan(&user)
-	c.JSON(http.StatusOK, gin.H{"msg": "Blocked succesfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "Blocked successfully"})
 }
 func UnBlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User
 	i.Db.Raw("UPDATE users SET block_status=false where id=?", params).Scan(&user)
-	c.JSON(http.StatusOK, gin.H{"msg": "Unblocked succesfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "Unblocked successfully"})
 }

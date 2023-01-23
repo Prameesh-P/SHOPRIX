@@ -3,32 +3,36 @@ package models
 import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
-	gorm.Model
-	FirstName    string `json:"first_name" validate:"required,min=2,max=100"`
-	LastName     string `json:"last_name"  validate:"required,min=2,max=100"`
-	Email        string `json:"email" gorm:"unique" validate:"email,required" `
-	Password     string `json:"password" validate:"required,min=6"`
-	Phone        string `json:"phone"  validate:"required"`
-	BlockStatus  bool   `json:"block_Status" `
-	Country  	 string `json:"country"`
-	City 		 string `json:"city"`
-	Pincode      string `json:"pincode"`
-	LandMark	 string `json:"landmark"`
-	
+	ID          uint   `json:"id" gorm:"primaryKey;unique"  `
+	FirstName   string `json:"first_name" validate:"required,min=2,max=100"`
+	LastName    string `json:"last_name"  validate:"required,min=2,max=100"`
+	Email       string `json:"email" gorm:"unique" validate:"email,required" `
+	Password    string `json:"password" validate:"required,min=6"`
+	Phone       string `json:"phone"  validate:"required"`
+	BlockStatus bool   `json:"block_Status" `
+	Country     string `json:"country"`
+	City        string `json:"city"`
+	Pincode     string `json:"pincode"`
+	LandMark    string `json:"landmark"`
+	Cart        Cart
+	CartId      uint `json:"cart_id"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
-type Address struct{
-	Email 		string `json:"email"`
-	UserID 		uint   `json:"user_id"`
-	Name 		string `json:"name"`
-	PhoneNum 	uint   `json:"phone_name"`
-	Pincode 	uint   `json:"pincode"`
-	Area		string `json:"area"`
-	House		string `json:"house"`
-	LandMark    string `json:"land_mark"`
-	City		string `json:"city"`
+type Address struct {
+	Email    string `json:"email"`
+	UserID   uint   `json:"user_id"`
+	Name     string `json:"name"`
+	PhoneNum uint   `json:"phone_name"`
+	Pincode  uint   `json:"pincode"`
+	Area     string `json:"area"`
+	House    string `json:"house"`
+	LandMark string `json:"land_mark"`
+	City     string `json:"city"`
 }
 type Admin struct {
 	gorm.Model
@@ -62,7 +66,7 @@ func (a *Admin) CheckPassword(incomingPass string) error {
 
 type Product struct {
 	gorm.Model
-	ProductId   uint   `json:"product_id" gorm:"primaryKey;not_null;autoIncrement" `
+	ProductId   uint   `json:"product_id" gorm:"autoIncrement" `
 	ProductName string `json:"product_name" gorm:"not null"  `
 	Price       uint   `json:"price" gorm:"not null"  `
 	ActualPrice uint   `json:"actual_price" gorm:"not null"`
@@ -94,17 +98,28 @@ type ShoeSize struct {
 	Size uint `json:"size"`
 }
 type Cart struct {
-	CartId      uint `json:"cart_id" gorm:"primaryKey"  `
-	UserId      uint `json:"user_id"   `
-	ProductID   uint `json:"product_id"  `
-	Quantity    uint `json:"quantity" `
-	TotalPrice uint  `json:"total_price"   `
+	CartId     uint `json:"cart_id" gorm:"primaryKey"`
+	UserId     uint `json:"user_id"   `
+	ProductID  uint `json:"product_id"  `
+	Quantity   uint `json:"quantity" `
+	TotalPrice uint `json:"total_price"   `
 }
-// type WishList struct {
-// 	gorm.Model
-// 	UserID     uint
-// 	Product_id uint
-// }
+type Cartsinfo struct {
+	gorm.Model
+	User_id      string
+	Product_id   string
+	Product_Name string
+	Price        string
+	Email        string
+	Quantity     string
+	Total_Price  string
+}
+
+//	type WishList struct {
+//		gorm.Model
+//		UserID     uint
+//		ProductId uint
+//	}
 type Coupon struct {
 	gorm.Model
 
