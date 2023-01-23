@@ -12,5 +12,6 @@ func SyncDb() {
 		&models.Category{},
 		&models.Address{},
 		&models.Cart{},
+		&models.Coupon{},
 	)
 }
