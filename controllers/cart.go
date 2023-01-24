@@ -5,10 +5,8 @@ import (
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
-	"math/rand"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func AddToCart(c *gin.Context) {
@@ -131,14 +129,14 @@ func CheckOutAddress(c *gin.Context) {
 	landmark := c.PostForm("landmark")
 	city := c.PostForm("city")
 	address := models.Address{
-		UserId:      user.ID,
-		Name:        Name,
-		PhoneNumber: phonenum,
-		Pincode:     pincode,
-		Area:        area,
-		House:       houseadd,
-		Landmark:    landmark,
-		City:        city,
+		UserId:    user.ID,
+		Name:      Name,
+		PhoneNum:  phonenum,
+		Pincode:   pincode,
+		Area:      area,
+		House:     houseadd,
+		Land_mark: landmark,
+		City:      city,
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {
@@ -180,13 +178,13 @@ func CheckOut(c *gin.Context) {
 	}
 	var totalCartValue uint
 	var address models.Address
-	addres := c.Query("addressID")
+	addres := c.PostForm("addressID")
 	addressID, _ := strconv.Atoi(addres)
-	PaymentMethod := c.Query("PaymentMethod")
-	Coupons := c.Query("coupon")
+	PaymentMethod := c.PostForm("PaymentMethod")
+	Coupons := c.PostForm("coupon")
 	cod := "COD"
 	razorpay := "RazorPay"
-	database.Db.Raw("select sum(total_prize) as total from carts where user_id=?", user.ID).Scan(&totalCartValue)
+	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalCartValue)
 
 	var CoupenDisc struct {
 		Coupen_code string
@@ -194,7 +192,7 @@ func CheckOut(c *gin.Context) {
 		Count       uint
 		Validity    uint
 	}
-	var AppliedCoupen struct {
+	var AppliedCoupon struct {
 		user_id     uint
 		Coupen_code string
 		count       uint
@@ -206,9 +204,9 @@ func CheckOut(c *gin.Context) {
 		})
 	} else if Coupons != "" {
 		flag = 1
-		database.Db.Raw("select coupon_code,discount,validity,count(*) as count from coupens where coupon_code=? group by discount,validity,copon_code", Coupons).Scan(&CoupenDisc)
-		database.Db.Raw("select user_id,coupon_code,count(*) as count from applied_coupons where coupon_code=? and user_id=? group by user_id,coupon_code", Coupons, user.ID).Scan(&AppliedCoupen)
-		if AppliedCoupen.count > 0 {
+		database.Db.Raw("select coupon_code,discount,validity,count(*) as count from coupons where coupon_code=? group by discount,validity,coupon_code", Coupons).Scan(&CoupenDisc)
+		database.Db.Raw("select user_id,coupon_code,count(*) as count from applied_coupons where coupon_code=? and user_id=? group by user_id,coupon_code", Coupons, user.ID).Scan(&AppliedCoupon)
+		if AppliedCoupon.count > 0 {
 			c.JSON(300, gin.H{
 				"msg": "Coupon already applied",
 			})
@@ -250,12 +248,12 @@ func CheckOut(c *gin.Context) {
 				discount := (totalAmount * CoupenDisc.Discount) / 100
 				TotalAmount := totalAmount - discount
 				orderedItems := models.OrderedItems{UserId: uint(puid), Product_id: uint(proID),
-					Product_Name: pname, Price: pprice, OrdersID: CreateOrderID(), Applied_Coupons: appliedCoupen,
+					Product_Name: pname, Price: pprice, OrdersID: CreateOrderId(), Applied_Coupons: appliedCoupen,
 					Order_Status: "confirmed", Payment_Status: "pending", Total_amount: TotalAmount}
 				database.Db.Create(&orderedItems)
 			}
 		}
-		record := database.Db.Raw("select address_id, user_id,name,phone_number,pincode,house,area,landmark,city from addresses where user_id=?", user.ID).Scan(&Address)
+		record := database.Db.Raw("select address_id, user_id,name,phone_num,pincode,house,area,land_mark,city from addresses where user_id=?", user.ID).Scan(&Address)
 		if record.Error != nil {
 			c.JSON(404, gin.H{
 				"err": record.Error.Error(),
@@ -269,10 +267,10 @@ func CheckOut(c *gin.Context) {
 			"address":          Address,
 			"total cart value": totalCartValue,
 		})
-		rand.Seed(time.Now().UnixNano())
-		value := rand.Intn(9999999999-1000000000) + 1000000000
-		id := strconv.Itoa(value)
-		orderID := "OID" + id
+		//rand.Seed(time.Now().UnixNano())
+		//value := rand.Intn(9999999999-1000000000) + 1000000000
+		//id := strconv.Itoa(value)
+		//orderID := "OID" + id
 		if address.UserId != user.ID {
 			c.JSON(200, gin.H{
 				"msg": "enter valid address id",
@@ -303,7 +301,6 @@ func CheckOut(c *gin.Context) {
 				totalCartValue = 0
 				var orderedItems models.OrderedItems
 				database.Db.Raw("update orderd_items set  order_status=?,payment_status=?,payment_method=? where user_id=?", "orderplaced", "payment completed", "wallet", user.ID).Scan(&orderedItems)
-
 			}
 		}
 	}

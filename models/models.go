@@ -25,15 +25,15 @@ type User struct {
 	UpdatedAt     time.Time
 }
 type Address struct {
-	AddressId   uint   `json:"address_id" gorm:"primaryKey"  `
-	UserId      uint   `json:"user_id"  gorm:"not null" `
-	Name        string `json:"name"  gorm:"not null" `
-	PhoneNumber int    `json:"phone_number"  gorm:"not null" `
-	Pincode     int    `json:"pincode"  gorm:"not null" `
-	House       string `json:"house"   `
-	Area        string `json:"area"   `
-	Landmark    string `json:"landmark"  gorm:"not null" `
-	City        string `json:"city"  gorm:"not null" `
+	AddressId uint   `json:"address_id" gorm:"primaryKey"  `
+	UserId    uint   `json:"user_id"  gorm:"not null" `
+	Name      string `json:"name"  gorm:"not null" `
+	PhoneNum  int    `json:"phone_number"  gorm:"not null" `
+	Pincode   int    `json:"pincode"  gorm:"not null" `
+	House     string `json:"house"   `
+	Area      string `json:"area"   `
+	Land_mark string `json:"landmark"  gorm:"not null" `
+	City      string `json:"city"  gorm:"not null" `
 }
 type Admin struct {
 	gorm.Model
@@ -149,4 +149,9 @@ type OrderedItems struct {
 	PaymentMethod   string
 	Applied_Coupons string
 	Total_amount    uint
+}
+type Applied_Coupons struct {
+	gorm.Model
+	UserID      uint
+	Coupon_Code string `json:"coupon_code" `
 }

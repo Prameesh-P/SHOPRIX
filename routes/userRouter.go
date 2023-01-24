@@ -17,6 +17,7 @@ func UserRoutes(routes *gin.Engine) {
 		user.GET("/viewcart", middlewares.UserAuth(), c.ViewCart)
 		user.GET("/razorpay", c.RazorPay)
 		user.POST("/checkoutAddress", middlewares.UserAuth(), c.CheckOutAddress)
+		user.GET("/checkout", middlewares.UserAuth(), c.CheckOut)
 	}
 	routes.POST("/signup", c.Signup)
 	routes.POST("/login", c.Login)
