@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
+	"math/rand"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 func AddToCart(c *gin.Context) {
@@ -82,7 +83,7 @@ type CartsInfo []struct {
 }
 
 func ViewCart(c *gin.Context) {
-	var cart CartsInfo
+	var cart models.Cart
 	var products models.Product
 	var user models.User
 	userEmail := c.Request.FormValue("user")
@@ -90,7 +91,7 @@ func ViewCart(c *gin.Context) {
 	newProduct, _ := strconv.Atoi(product)
 	quantity := c.Request.FormValue("quantity")
 	newQuantity, _ := strconv.Atoi(quantity)
-	database.Db.Raw("select price from prooducts where product_id=?", uint(newProduct)).Scan(&products)
+	database.Db.Raw("select price from products where product_id=?", uint(newProduct)).Scan(&products)
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	total := products.Price * uint(newQuantity)
 	if newQuantity >= 1 {
@@ -116,13 +117,13 @@ func ViewCart(c *gin.Context) {
 	})
 }
 func CheckOutAddress(c *gin.Context) {
-	useremail := c.GetString("user")
+	useremail := c.PostForm("user")
 	var user models.User
 	database.Db.Raw("select id from users where email=?", useremail).Scan(&user)
 
 	Name := c.PostForm("name")
-	Phonenum := c.PostForm("phone_number")
-	phonenum, _ := strconv.Atoi(Phonenum)
+	Phonenum1 := c.PostForm("phone_number")
+	phonenum, _ := strconv.Atoi(Phonenum1)
 	pincod := c.PostForm("pincode")
 	pincode, _ := strconv.Atoi(pincod)
 	area := c.PostForm("area")
@@ -138,6 +139,7 @@ func CheckOutAddress(c *gin.Context) {
 		House:    houseadd,
 		LandMark: landmark,
 		City:     city,
+		Email:    useremail,
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {
@@ -150,4 +152,137 @@ func CheckOutAddress(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg": "Address added",
 	})
+}
+
+var Address []struct {
+	UserId       uint
+	Address_id   uint
+	Name         string
+	Phone_number uint
+	Pincode      uint
+	Area         string
+	House        string
+	Landmark     string
+	City         string
+}
+
+func CheckOut(c *gin.Context) {
+	var user models.User
+	var cart models.Cart
+	var carts CartsInfo
+	userEmail := c.Request.FormValue("user")
+	wallet := c.Query("ApplyWallet")
+	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
+	precord := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&cart)
+	if precord.Error != nil {
+		c.JSON(404, gin.H{"err": precord.Error.Error()})
+		c.Abort()
+		return
+	}
+	var totalCartValue uint
+	var address models.Address
+	addres := c.Query("addressID")
+	addressID, _ := strconv.Atoi(addres)
+	PaymentMethod := c.Query("PaymentMethod")
+	Coupons := c.Query("coupon")
+	cod := "COD"
+	razorpay := "RazorPay"
+	database.Db.Raw("select sum(total_prize) as total from carts where user_id=?", user.ID).Scan(&totalCartValue)
+
+	var CoupenDisc struct {
+		Coupen_code string
+		Discount    uint
+		Count       uint
+		Validity    uint
+	}
+	var AppliedCoupen struct {
+		user_id     uint
+		Coupen_code string
+		count       uint
+	}
+	var flag = 0
+	if Coupons == "" {
+		c.JSON(300, gin.H{
+			"msg": "Enter a coupon if you have any coupon",
+		})
+	} else if Coupons != "" {
+		flag = 1
+		database.Db.Raw("select coupon_code,discount,validity,count(*) as count from coupens where coupon_code=? group by discount,validity,copon_code", Coupons).Scan(&CoupenDisc)
+		database.Db.Raw("select user_id,coupon_code,count(*) as count from applied_coupons where coupon_code=? and user_id=? group by user_id,coupon_code", Coupons, user.ID).Scan(&AppliedCoupen)
+		if AppliedCoupen.count > 0 {
+			c.JSON(300, gin.H{
+				"msg": "Coupon already applied",
+			})
+			flag = 2
+		}
+		if CoupenDisc.Count <= 0 {
+			c.JSON(300, gin.H{
+				"msg": "not a valid coupon",
+			})
+			flag = 2
+		}
+		//if CoupenDisc.Validity < time.Now().Local().Unix() && CoupenDisc.Validity > 1 {
+		//
+		//	c.JSON(300, gin.H{
+		//		"msg": "coupon expired",
+		//	})
+		//	flag = 2
+		//
+		//}
+		if flag == 1 {
+
+			Discount := (totalCartValue * CoupenDisc.Discount) / 100
+			totalCartValue = totalCartValue - Discount
+
+		}
+		if PaymentMethod == cod && PaymentMethod == razorpay {
+			for _, v := range carts {
+				pud := v.UserId
+				puid, _ := strconv.Atoi(pud)
+				pid := v.ProductId
+				proID, _ := strconv.Atoi(pid)
+				pname := v.ProductName
+				pprice := v.Price
+				Pprice, _ := strconv.Atoi(pprice)
+				pQuantity := v.Quantity
+				PQuantity, _ := strconv.Atoi(pQuantity)
+				appliedCoupen := CoupenDisc.Coupen_code
+				totalAmount := uint(PQuantity) * uint(Pprice)
+				discount := (totalAmount * CoupenDisc.Discount) / 100
+				TotalAmount := totalAmount - discount
+				orderedItems := models.OrderedItems{UserId: uint(puid), Product_id: uint(proID),
+					Product_Name: pname, Price: pprice, OrdersID: CreateOrderID(), Applied_Coupons: appliedCoupen,
+					Order_Status: "confirmed", Payment_Status: "pending", Total_amount: TotalAmount}
+				database.Db.Create(&orderedItems)
+			}
+		}
+		record := database.Db.Raw("select address_id, user_id,name,phone_number,pincode,house,area,landmark,city from addresses where user_id=?", user.ID).Scan(&Address)
+		if record.Error != nil {
+			c.JSON(404, gin.H{
+				"err": record.Error.Error(),
+			})
+			c.Abort()
+			return
+		}
+		database.Db.Raw("select address_id,user_id,name from addresses where address_id=?", addressID).Scan(&address)
+
+		c.JSON(300, gin.H{
+			"address":          Address,
+			"total cart value": totalCartValue,
+		})
+		rand.Seed(time.Now().UnixNano())
+		value := rand.Intn(9999999999-1000000000) + 1000000000
+		id := strconv.Itoa(value)
+		orderID := "OID" + id
+		if address.UserID != user.ID {
+			c.JSON(200, gin.H{
+				"msg": "enter valid address id",
+			})
+		}
+		database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&user)
+		if wallet {
+
+		}
+	}
+
 }

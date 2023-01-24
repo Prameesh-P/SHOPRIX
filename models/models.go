@@ -128,3 +128,16 @@ type Coupon struct {
 	Quantity    uint   `json:"quantity"`
 	Validity    int64  `json:"validity"`
 }
+type OrderedItems struct {
+	gorm.Model
+	UserId          uint `json:"user_id"  gorm:"not null" `
+	Product_id      uint
+	OrdersID        string
+	Product_Name    string
+	Price           string
+	Order_Status    string
+	Payment_Status  string
+	PaymentMethod   string
+	Applied_Coupons string
+	Total_amount    uint
+}
