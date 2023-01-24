@@ -7,32 +7,33 @@ import (
 )
 
 type User struct {
-	ID          uint   `json:"id" gorm:"primaryKey;unique"  `
-	FirstName   string `json:"first_name" validate:"required,min=2,max=100"`
-	LastName    string `json:"last_name"  validate:"required,min=2,max=100"`
-	Email       string `json:"email" gorm:"unique" validate:"email,required" `
-	Password    string `json:"password" validate:"required,min=6"`
-	Phone       string `json:"phone"  validate:"required"`
-	BlockStatus bool   `json:"block_Status" `
-	Country     string `json:"country"`
-	City        string `json:"city"`
-	Pincode     string `json:"pincode"`
-	LandMark    string `json:"landmark"`
-	Cart        Cart
-	CartId      uint `json:"cart_id"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            uint   `json:"id" gorm:"primaryKey;unique"  `
+	FirstName     string `json:"first_name" validate:"required,min=2,max=100"`
+	LastName      string `json:"last_name"  validate:"required,min=2,max=100"`
+	Email         string `json:"email" gorm:"unique" validate:"email,required" `
+	Password      string `json:"password" validate:"required,min=6"`
+	Phone         string `json:"phone"  validate:"required"`
+	BlockStatus   bool   `json:"block_Status" `
+	Country       string `json:"country"`
+	City          string `json:"city"`
+	Pincode       string `json:"pincode"`
+	LandMark      string `json:"landmark"`
+	Cart          Cart
+	CartId        uint `json:"cart_id"`
+	WalletBalance uint `json:"wallet_balance" `
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 type Address struct {
-	Email    string `json:"email"`
-	UserID   uint   `json:"user_id"`
-	Name     string `json:"name"`
-	PhoneNum uint   `json:"phone_name"`
-	Pincode  uint   `json:"pincode"`
-	Area     string `json:"area"`
-	House    string `json:"house"`
-	LandMark string `json:"land_mark"`
-	City     string `json:"city"`
+	AddressId   uint   `json:"address_id" gorm:"primaryKey"  `
+	UserId      uint   `json:"user_id"  gorm:"not null" `
+	Name        string `json:"name"  gorm:"not null" `
+	PhoneNumber int    `json:"phone_number"  gorm:"not null" `
+	Pincode     int    `json:"pincode"  gorm:"not null" `
+	House       string `json:"house"   `
+	Area        string `json:"area"   `
+	Landmark    string `json:"landmark"  gorm:"not null" `
+	City        string `json:"city"  gorm:"not null" `
 }
 type Admin struct {
 	gorm.Model
@@ -115,11 +116,19 @@ type Cartsinfo struct {
 	Total_Price  string
 }
 
-//	type WishList struct {
-//		gorm.Model
-//		UserID     uint
-//		ProductId uint
-//	}
+type Orders struct {
+	gorm.Model
+	UserId          uint   `json:"user_id"  gorm:"not null" `
+	Order_id        string `json:"order_id"  gorm:"not null" `
+	Total_Amount    uint   `json:"total_amount"  gorm:"not null" `
+	Applied_Coupons string `json:"applied_coupons"  `
+	Discount        uint   `json:"discount"   `
+	PaymentMethod   string `json:"paymentmethod"  gorm:"not null" `
+	Payment_Status  string `json:"payment_status"   `
+	Order_Status    string `json:"order_status"   `
+	Address         Address
+	Address_id      uint `json:"address_id"  `
+}
 type Coupon struct {
 	gorm.Model
 

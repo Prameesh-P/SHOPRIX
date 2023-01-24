@@ -131,15 +131,14 @@ func CheckOutAddress(c *gin.Context) {
 	landmark := c.PostForm("landmark")
 	city := c.PostForm("city")
 	address := models.Address{
-		UserID:   user.ID,
-		Name:     Name,
-		PhoneNum: uint(phonenum),
-		Pincode:  uint(pincode),
-		Area:     area,
-		House:    houseadd,
-		LandMark: landmark,
-		City:     city,
-		Email:    useremail,
+		UserId:      user.ID,
+		Name:        Name,
+		PhoneNumber: phonenum,
+		Pincode:     pincode,
+		Area:        area,
+		House:       houseadd,
+		Landmark:    landmark,
+		City:        city,
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {
@@ -274,15 +273,41 @@ func CheckOut(c *gin.Context) {
 		value := rand.Intn(9999999999-1000000000) + 1000000000
 		id := strconv.Itoa(value)
 		orderID := "OID" + id
-		if address.UserID != user.ID {
+		if address.UserId != user.ID {
 			c.JSON(200, gin.H{
 				"msg": "enter valid address id",
 			})
 		}
 		database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&user)
-		if wallet {
+		if wallet == "use-wallet" && addressID == int(address.AddressId) && address.UserId == user.ID {
+			if user.WalletBalance > totalCartValue {
+				c.JSON(400, gin.H{
+					"msg": "can't apply wallet money on this transaction..Try another method..!!",
+				})
+				c.Abort()
+				return
+			} else if user.WalletBalance > totalCartValue {
+				user.WalletBalance = user.WalletBalance - totalCartValue
+				database.Db.Model(&user).Where("id=?", user.ID).Update("wallet-balance", user.WalletBalance)
 
+				walletOrder := models.Orders{
+					UserId:         user.ID,
+					Order_id:       CreateOrderId(),
+					Total_Amount:   totalCartValue,
+					PaymentMethod:  "wallet",
+					Payment_Status: "payment completed",
+					Order_Status:   "order placed",
+					Address_id:     uint(addressID),
+				}
+				database.Db.Create(&walletOrder)
+				totalCartValue = 0
+				var orderedItems models.OrderedItems
+				database.Db.Raw("update orderd_items set  order_status=?,payment_status=?,payment_method=? where user_id=?", "orderplaced", "payment completed", "wallet", user.ID).Scan(&orderedItems)
+
+			}
 		}
 	}
-
+	c.JSON(200, gin.H{
+		"msg": "order Placed",
+	})
 }
