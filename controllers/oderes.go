@@ -57,3 +57,27 @@ func ViewOrders(c *gin.Context) {
 		"orders": ordered_items,
 	})
 }
+func ReturnOrders(c *gin.Context) {
+	var order models.OrderedItems
+	var user models.User
+	userEmail := c.PostForm("user")
+	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
+	var orderReturn struct {
+		OrderId string
+	}
+	if err := c.ShouldBindJSON(&orderReturn); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		c.Abort()
+		return
+	}
+	database.Db.Where("orders_id=?", orderReturn.OrderId).Find(&order)
+	if order.Order_Status == "returned" {
+		c.JSON(400, gin.H{
+			"msg": "Item already reaturned",
+		})
+		c.Abort()
+		return
+	}
+}
