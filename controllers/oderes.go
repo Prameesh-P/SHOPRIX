@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"github.com/Prameesh-P/SHOPRIX/database"
+	"github.com/Prameesh-P/SHOPRIX/models"
+	"github.com/gin-gonic/gin"
 	"math/rand"
 	"strconv"
 	"time"
@@ -26,4 +29,31 @@ func CreateOrderId() string {
 	id := strconv.Itoa(value)
 	orderID := "OID" + id
 	return orderID
+}
+func ViewOrders(c *gin.Context) {
+	var user models.User
+	var ordered_items Orderd_Items
+	userEmail := c.PostForm("user")
+	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
+	record := database.Db.Raw("select user_id,product_id,product_name,applied_coupons,price,orders_id,order_status,payment_status,payment_method,total_amount from ordered_items where user_id=?", user.ID).Scan(&ordered_items)
+	if search := c.PostForm("search"); search != "" {
+		query := database.Db.Raw("select user_id,product_id,product_name,applied_coupons,price,orders_id,order_status,payment_status,payment_method,total_amount from ordered_items where (product_name ilike ? or payment_method ilike ? )and user_id=? ", "%"+search+"%", "%"+search+"%", user.ID).Scan(&ordered_items)
+		if query.Error != nil {
+			c.JSON(404, gin.H{
+				"err": query.Error.Error(),
+			})
+			c.Abort()
+			return
+		}
+	}
+	if record.Error != nil {
+		c.JSON(404, gin.H{
+			"err": record.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	c.JSON(200, gin.H{
+		"orders": ordered_items,
+	})
 }
