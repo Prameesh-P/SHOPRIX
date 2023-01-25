@@ -19,6 +19,7 @@ func UserRoutes(routes *gin.Engine) {
 		user.POST("/checkoutAddress", middlewares.UserAuth(), c.CheckOutAddress)
 		user.GET("/checkout", middlewares.UserAuth(), c.CheckOut)
 		user.GET("/vieworder", middlewares.UserAuth(), c.ViewOrders)
+		user.GET("/returnorder", middlewares.UserAuth(), c.ReturnOrders)
 	}
 	routes.POST("/signup", c.Signup)
 	routes.POST("/login", c.Login)

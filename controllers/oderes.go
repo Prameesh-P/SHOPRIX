@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
@@ -60,12 +61,13 @@ func ViewOrders(c *gin.Context) {
 func ReturnOrders(c *gin.Context) {
 	var order models.OrderedItems
 	var user models.User
-	userEmail := c.PostForm("user")
+	userEmail := c.Query("user")
+	fmt.Println(userEmail)
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	var orderReturn struct {
 		OrderId string
 	}
-	if err := c.ShouldBindJSON(&orderReturn); err != nil {
+	if err := c.BindJSON(&orderReturn); err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
 		})
@@ -75,9 +77,59 @@ func ReturnOrders(c *gin.Context) {
 	database.Db.Where("orders_id=?", orderReturn.OrderId).Find(&order)
 	if order.Order_Status == "returned" {
 		c.JSON(400, gin.H{
-			"msg": "Item already reaturned",
+			"msg": "Item already returned",
 		})
 		c.Abort()
 		return
 	}
+	var balance int
+	database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&balance)
+	//tx := database.Db.Begin()
+	record := database.Db.Model(&models.OrderedItems{}).Where("orders_id=?", orderReturn.OrderId).Update("order_status", "returned")
+	if record.Error != nil {
+		//tx.Rollback()
+		c.JSON(404, gin.H{
+			"err": record.Error.Error(),
+		})
+		c.Abort()
+		return
+	}
+	newBalance := balance + int(order.Total_amount)
+	record1 := database.Db.Model(&models.User{}).Where("id=?", user.ID).Update("wallet_balance", newBalance)
+	if record1.Error != nil {
+		//tx.Rollback()
+		c.JSON(404, gin.H{
+			"err": record1.Error.Error(),
+		})
+	}
+	c.JSON(200, gin.H{
+		"msg": "order returned",
+	})
+}
+func CancelOrders(c *gin.Context) {
+	var user models.User
+	userEmail := c.Query("user")
+	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
+	oderID := c.Query("orderid")
+	var orders models.OrderedItems
+	database.Db.Where("orders_id=?", oderID).Find(&orders)
+	fmt.Println(orders.Order_Status, orders.OrdersID)
+	fmt.Println(oderID)
+	if orders.Order_Status == "order cancelled" {
+		c.JSON(400, gin.H{
+			"status": "false",
+			"msg":    "Order already cancelled..!!",
+		})
+		return
+	}
+	database.Db.Raw("update ordered_items set order_status=? where order_id=?", "order cancelled", oderID).Scan(&orders)
+	var price int
+	database.Db.Raw("SELECT total_amount FROM orderd_items WHERE orders_id = ?", oderID).Scan(&price)
+	var balance int
+	database.Db.Raw("SELECT wallet_balance FROM users WHERE id = ?", user.ID).Scan(&balance)
+	newBalance := price + balance
+	database.Db.Raw("update users set wallet_balance=? where id=?", newBalance, user.ID).Scan(&user)
+	c.JSON(200, gin.H{
+		"msg": "order cancelled",
+	})
 }
