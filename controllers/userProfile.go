@@ -64,7 +64,6 @@ func AddAddress(c *gin.Context) {
 	houseadd := c.PostForm("house")
 	landmark := c.PostForm("landmark")
 	city := c.Request.FormValue("city")
-
 	address := models.Address{
 		UserId:    user.ID,
 		Name:      Name,

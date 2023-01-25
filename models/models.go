@@ -7,22 +7,24 @@ import (
 )
 
 type User struct {
-	ID            uint   `json:"id" gorm:"primaryKey;unique"  `
-	FirstName     string `json:"first_name" validate:"required,min=2,max=100"`
-	LastName      string `json:"last_name"  validate:"required,min=2,max=100"`
-	Email         string `json:"email" gorm:"unique" validate:"email,required" `
-	Password      string `json:"password" validate:"required,min=6"`
-	Phone         string `json:"phone"  validate:"required"`
-	BlockStatus   bool   `json:"block_Status" `
-	Country       string `json:"country"`
-	City          string `json:"city"`
-	Pincode       string `json:"pincode"`
-	LandMark      string `json:"landmark"`
-	Cart          Cart
-	CartId        uint `json:"cart_id"`
-	WalletBalance uint `json:"wallet_balance" `
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID                uint   `json:"id" gorm:"primaryKey;unique"  `
+	FirstName         string `json:"first_name" validate:"required,min=2,max=100"`
+	LastName          string `json:"last_name"  validate:"required,min=2,max=100"`
+	Email             string `json:"email" gorm:"unique" validate:"email,required" `
+	Password          string `json:"password" validate:"required,min=6"`
+	Phone             string `json:"phone"  validate:"required"`
+	BlockStatus       bool   `json:"block_Status" `
+	Country           string `json:"country"`
+	City              string `json:"city"`
+	Pincode           string `json:"pincode"`
+	LandMark          string `json:"landmark"`
+	Cart              Cart
+	CartId            uint `json:"cart_id"`
+	WalletBalance     uint `json:"wallet_balance" `
+	Applied_Coupons   Applied_Coupons
+	Applied_CouponsID uint
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 type Address struct {
 	AddressId uint   `json:"address_id" gorm:"primaryKey"  `
@@ -138,8 +140,8 @@ type Coupon struct {
 	Validity    int64  `json:"validity"`
 }
 type OrderedItems struct {
-	gorm.Model
-	UserId          uint `json:"user_id"  gorm:"not null" `
+	ID              uint `json:"id" gorm:"autoIncrement:true" `
+	UserId          uint `json:"user_id" `
 	Product_id      uint
 	OrdersID        string
 	Product_Name    string

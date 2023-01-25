@@ -81,7 +81,7 @@ type CartsInfo []struct {
 }
 
 func ViewCart(c *gin.Context) {
-	var cart models.Cart
+	var cartss CartsInfo
 	var products models.Product
 	var user models.User
 	userEmail := c.Request.FormValue("user")
@@ -93,11 +93,11 @@ func ViewCart(c *gin.Context) {
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	total := products.Price * uint(newQuantity)
 	if newQuantity >= 1 {
-		database.Db.Raw("update carts set quantity=?,total_price=? where user_id=? and product_id=?", newQuantity, total, user.ID, newProduct).Scan(&cart)
+		database.Db.Raw("update carts set quantity=?,total_price=? where user_id=? and product_id=?", newQuantity, total, user.ID, newProduct).Scan(&cartss)
 	} else if newQuantity <= 0 {
-		database.Db.Raw("dalete from carts where product_id=? and user_id=?", newProduct, user.ID).Scan(&cart)
+		database.Db.Raw("dalete from carts where product_id=? and user_id=?", newProduct, user.ID).Scan(&cartss)
 	}
-	record := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&cart)
+	record := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&cartss)
 	if record.Error != nil {
 		c.JSON(404, gin.H{
 			"err": record.Error.Error(),
@@ -105,13 +105,34 @@ func ViewCart(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
+	for _, v := range cartss {
+		productID := v.ProductId
+		//ProdctId,_:=strconv.Atoi(productID)
+		userID := v.UserId
+		//UserId,_:=strconv.Atoi(userID)
+		ProName := v.ProductName
+		quantity := v.Quantity
+		//Quantity,_:=strconv.Atoi(quantity)
+		PEmail := v.Email
+		Tprice := v.TotalPrice
+		//TotalPriceL,_:=strconv.Atoi(Tprice)
+		carts := models.Cartsinfo{
+			User_id:      userID,
+			Product_id:   productID,
+			Product_Name: ProName,
+			Quantity:     quantity,
+			Email:        PEmail,
+			Total_Price:  Tprice,
+		}
+		database.Db.Create(&carts)
+	}
 	var totalcartvalue uint
 
+	fmt.Println(cartss)
 	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalcartvalue)
 	c.JSON(200, gin.H{
-		"cart":  cart,
-		"total": totalcartvalue,
+		"cartss": cartss,
+		"total":  totalcartvalue,
 	})
 }
 func CheckOutAddress(c *gin.Context) {
@@ -166,145 +187,159 @@ var Address []struct {
 func CheckOut(c *gin.Context) {
 	var user models.User
 	var cart models.Cart
+	fmt.Println(cart)
 	var carts CartsInfo
-	userEmail := c.Request.FormValue("user")
-	wallet := c.Query("ApplyWallet")
+	userEmail := c.PostForm("user")
+	//wallet := c.Query("ApplyWallet")
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
-	precord := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&cart)
+	precord := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&carts)
 	if precord.Error != nil {
 		c.JSON(404, gin.H{"err": precord.Error.Error()})
 		c.Abort()
 		return
 	}
 	var totalCartValue uint
-	var address models.Address
-	addres := c.PostForm("addressID")
-	addressID, _ := strconv.Atoi(addres)
+	//var address models.Address
+	//addres := c.PostForm("addressID")
+	//addressID, _ := strconv.Atoi(addres)
 	PaymentMethod := c.PostForm("PaymentMethod")
-	Coupons := c.PostForm("coupon")
-	cod := "COD"
-	razorpay := "RazorPay"
+	//Coupons := c.PostForm("coupon")
+	//cod := "COD"
+	//fmt.Printf("codd..%s", cod)
+	//razorpay := "RazorPay"
 	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalCartValue)
+	//var CoupenDisc struct {
+	//	Coupen_code string
+	//	Discount    uint
+	//	Count       uint
+	//	Validity    uint
+	//}
+	//var AppliedCoupon struct {
+	//	user_id     uint
+	//	Coupen_code string
+	//	count       uint
+	//}
+	//var flag = 0
+	//if Coupons == "" {
+	//	c.JSON(300, gin.H{
+	//		"msg": "Enter a coupon if you have any coupon",
+	//	})
+	//} else if Coupons != "" {
+	//	flag = 1
+	//	database.Db.Raw("select coupon_code,discount,validity,count(*) as count from coupons where coupon_code=? group by discount,validity,coupon_code", Coupons).Scan(&CoupenDisc)
+	//	database.Db.Raw("select user_id,coupon_code,count(*) as count from applied_coupons where coupon_code=? and user_id=? group by user_id,coupon_code", Coupons, user.ID).Scan(&AppliedCoupon)
+	//	if AppliedCoupon.count > 0 {
+	//		c.JSON(300, gin.H{
+	//			"msg": "Coupon already applied",
+	//		})
+	//		flag = 2
+	//	}
+	//	if CoupenDisc.Count <= 0 {
+	//		c.JSON(300, gin.H{
+	//			"msg": "not a valid coupon",
+	//		})
+	//		flag = 2
+	//	}
+	//	//if CoupenDisc.Validity < time.Now().Local().Unix() && CoupenDisc.Validity > 1 {
+	//	//
+	//	//	c.JSON(300, gin.H{
+	//	//		"msg": "coupon expired",
+	//	//	})
+	//	//	flag = 2
+	//	//
+	//	//}
+	//	if flag == 1 {
+	//
+	//		Discount := (totalCartValue * CoupenDisc.Discount) / 100
+	//		totalCartValue = totalCartValue - Discount
+	//
+	//	}
+	if PaymentMethod == "COD" {
+		fmt.Println(carts)
+		fmt.Println("hyyyyyyyy..............")
+		for _, v := range carts {
+			pud := v.UserId
+			puid, _ := strconv.Atoi(pud)
+			fmt.Println(puid)
+			pid := v.ProductId
+			proID, _ := strconv.Atoi(pid)
+			pname := v.ProductName
+			fmt.Println(pname)
+			pprice := v.Price
+			Pprice, _ := strconv.Atoi(pprice)
+			pQuantity := v.Quantity
+			PQuantity, _ := strconv.Atoi(pQuantity)
+			fmt.Println(CreateOrderId())
+			//appliedCoupen := CoupenDisc.Coupen_code
+			totalAmount := uint(PQuantity) * uint(Pprice)
+			//discount := (totalAmount * CoupenDisc.Discount) / 100
+			TotalAmount := totalAmount
+			orderedItems := models.OrderedItems{UserId: uint(puid), Product_id: uint(proID),
+				Product_Name: pname, Price: pprice, OrdersID: CreateOrderId(),
+				Order_Status: "confirmed", PaymentMethod: PaymentMethod, Payment_Status: "pending", Total_amount: TotalAmount}
+			database.Db.Create(&orderedItems)
 
-	var CoupenDisc struct {
-		Coupen_code string
-		Discount    uint
-		Count       uint
-		Validity    uint
-	}
-	var AppliedCoupon struct {
-		user_id     uint
-		Coupen_code string
-		count       uint
-	}
-	var flag = 0
-	if Coupons == "" {
-		c.JSON(300, gin.H{
-			"msg": "Enter a coupon if you have any coupon",
+		}
+
+		c.JSON(200, gin.H{
+			"msg": "Cash on delivery placed..!!",
 		})
-	} else if Coupons != "" {
-		flag = 1
-		database.Db.Raw("select coupon_code,discount,validity,count(*) as count from coupons where coupon_code=? group by discount,validity,coupon_code", Coupons).Scan(&CoupenDisc)
-		database.Db.Raw("select user_id,coupon_code,count(*) as count from applied_coupons where coupon_code=? and user_id=? group by user_id,coupon_code", Coupons, user.ID).Scan(&AppliedCoupon)
-		if AppliedCoupon.count > 0 {
-			c.JSON(300, gin.H{
-				"msg": "Coupon already applied",
-			})
-			flag = 2
-		}
-		if CoupenDisc.Count <= 0 {
-			c.JSON(300, gin.H{
-				"msg": "not a valid coupon",
-			})
-			flag = 2
-		}
-		//if CoupenDisc.Validity < time.Now().Local().Unix() && CoupenDisc.Validity > 1 {
-		//
-		//	c.JSON(300, gin.H{
-		//		"msg": "coupon expired",
-		//	})
-		//	flag = 2
-		//
-		//}
-		if flag == 1 {
-
-			Discount := (totalCartValue * CoupenDisc.Discount) / 100
-			totalCartValue = totalCartValue - Discount
-
-		}
-		if PaymentMethod == cod && PaymentMethod == razorpay {
-			for _, v := range carts {
-				pud := v.UserId
-				puid, _ := strconv.Atoi(pud)
-				pid := v.ProductId
-				proID, _ := strconv.Atoi(pid)
-				pname := v.ProductName
-				pprice := v.Price
-				Pprice, _ := strconv.Atoi(pprice)
-				pQuantity := v.Quantity
-				PQuantity, _ := strconv.Atoi(pQuantity)
-				appliedCoupen := CoupenDisc.Coupen_code
-				totalAmount := uint(PQuantity) * uint(Pprice)
-				discount := (totalAmount * CoupenDisc.Discount) / 100
-				TotalAmount := totalAmount - discount
-				orderedItems := models.OrderedItems{UserId: uint(puid), Product_id: uint(proID),
-					Product_Name: pname, Price: pprice, OrdersID: CreateOrderId(), Applied_Coupons: appliedCoupen,
-					Order_Status: "confirmed", Payment_Status: "pending", Total_amount: TotalAmount}
-				database.Db.Create(&orderedItems)
-			}
-		}
-		record := database.Db.Raw("select address_id, user_id,name,phone_num,pincode,house,area,land_mark,city from addresses where user_id=?", user.ID).Scan(&Address)
-		if record.Error != nil {
-			c.JSON(404, gin.H{
-				"err": record.Error.Error(),
-			})
-			c.Abort()
-			return
-		}
-		database.Db.Raw("select address_id,user_id,name from addresses where address_id=?", addressID).Scan(&address)
-
-		c.JSON(300, gin.H{
-			"address":          Address,
-			"total cart value": totalCartValue,
-		})
-		//rand.Seed(time.Now().UnixNano())
-		//value := rand.Intn(9999999999-1000000000) + 1000000000
-		//id := strconv.Itoa(value)
-		//orderID := "OID" + id
-		if address.UserId != user.ID {
-			c.JSON(200, gin.H{
-				"msg": "enter valid address id",
-			})
-		}
-		database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&user)
-		if wallet == "use-wallet" && addressID == int(address.AddressId) && address.UserId == user.ID {
-			if user.WalletBalance > totalCartValue {
-				c.JSON(400, gin.H{
-					"msg": "can't apply wallet money on this transaction..Try another method..!!",
-				})
-				c.Abort()
-				return
-			} else if user.WalletBalance > totalCartValue {
-				user.WalletBalance = user.WalletBalance - totalCartValue
-				database.Db.Model(&user).Where("id=?", user.ID).Update("wallet-balance", user.WalletBalance)
-
-				walletOrder := models.Orders{
-					UserId:         user.ID,
-					Order_id:       CreateOrderId(),
-					Total_Amount:   totalCartValue,
-					PaymentMethod:  "wallet",
-					Payment_Status: "payment completed",
-					Order_Status:   "order placed",
-					Address_id:     uint(addressID),
-				}
-				database.Db.Create(&walletOrder)
-				totalCartValue = 0
-				var orderedItems models.OrderedItems
-				database.Db.Raw("update orderd_items set  order_status=?,payment_status=?,payment_method=? where user_id=?", "orderplaced", "payment completed", "wallet", user.ID).Scan(&orderedItems)
-			}
-		}
 	}
-	c.JSON(200, gin.H{
-		"msg": "order Placed",
-	})
+
+	//record := database.Db.Raw("select address_id, user_id,name,phone_num,pincode,house,area,land_mark,city from addresses where user_id=?", user.ID).Scan(&Address)
+	//if record.Error != nil {
+	//	c.JSON(404, gin.H{
+	//		"err": record.Error.Error(),
+	//	})
+	//	c.Abort()
+	//	return
+	//}
+	//database.Db.Raw("select address_id,user_id,name from addresses where address_id=?", addressID).Scan(&address)
+
+	//c.JSON(300, gin.H{
+	//	"address":          Address,
+	//	"total cart value": totalCartValue,
+	//})
+
+	//rand.Seed(time.Now().UnixNano())
+	//value := rand.Intn(9999999999-1000000000) + 1000000000
+	//id := strconv.Itoa(value)
+	//orderID := "OID" + id
+
+	//if address.UserId != user.ID {
+	//	c.JSON(200, gin.H{
+	//		"msg": "enter valid address id",
+	//	})
+	//}
+
+	//database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&user)
+	//if wallet == "use-wallet" && addressID == int(address.AddressId) && address.UserId == user.ID {
+	//	if user.WalletBalance > totalCartValue {
+	//		c.JSON(400, gin.H{
+	//			"msg": "can't apply wallet money on this transaction..Try another method..!!",
+	//		})
+	//		c.Abort()
+	//		return
+	//	} else if user.WalletBalance > totalCartValue {
+	//		user.WalletBalance = user.WalletBalance - totalCartValue
+	//		database.Db.Model(&user).Where("id=?", user.ID).Update("wallet-balance", user.WalletBalance)
+	//
+	//		walletOrder := models.Orders{
+	//			UserId:         user.ID,
+	//			Order_id:       CreateOrderId(),
+	//			Total_Amount:   totalCartValue,
+	//			PaymentMethod:  "wallet",
+	//			Payment_Status: "payment completed",
+	//			Order_Status:   "order placed",
+	//			Address_id:     uint(addressID),
+	//		}
+	//		database.Db.Create(&walletOrder)
+	//		totalCartValue = 0
+	//		var orderedItems models.OrderedItems
+	//		database.Db.Raw("update orderd_items set  order_status=?,payment_status=?,payment_method=? where user_id=?", "orderplaced", "payment completed", "wallet", user.ID).Scan(&orderedItems)
+	//	}
+	//}
+	//c.JSON(200, gin.H{
+	//	"msg": "order Placed",
+	//})
 }
