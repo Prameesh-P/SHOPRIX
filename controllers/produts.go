@@ -87,7 +87,6 @@ func ApplyDiscount(c *gin.Context) {
 	}
 }
 func ProductAdding(c *gin.Context) {
-
 	prodname := c.Request.FormValue("productname")
 	price := c.Request.FormValue("price")
 	Price, _ := strconv.Atoi(price)

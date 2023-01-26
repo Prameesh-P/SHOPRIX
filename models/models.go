@@ -155,3 +155,10 @@ type Applied_Coupons struct {
 	UserID      uint
 	Coupon_Code string `json:"coupon_code" `
 }
+type Charge struct {
+	gorm.Model
+	Amount       int64   `json:"amount"`
+	ReceiptEmail string  `json:"receiptMail"`
+	ProductName  string  `json:"productName"`
+	Address      Address `json:"address"`
+}
