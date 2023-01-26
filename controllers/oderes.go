@@ -122,9 +122,9 @@ func CancelOrders(c *gin.Context) {
 		})
 		return
 	}
-	database.Db.Raw("update ordered_items set order_status=? where order_id=?", "order cancelled", oderID).Scan(&orders)
+	database.Db.Raw("update ordered_items set order_status=? where orders_id=?", "order cancelled", oderID).Scan(&orders)
 	var price int
-	database.Db.Raw("SELECT total_amount FROM orderd_items WHERE orders_id = ?", oderID).Scan(&price)
+	database.Db.Raw("SELECT total_amount FROM ordered_items WHERE orders_id = ?", oderID).Scan(&price)
 	var balance int
 	database.Db.Raw("SELECT wallet_balance FROM users WHERE id = ?", user.ID).Scan(&balance)
 	newBalance := price + balance

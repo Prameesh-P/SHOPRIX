@@ -30,7 +30,7 @@ func ListAllCategory(c *gin.Context) {
 	var categorys models.Category
 	var shoesizes models.ShoeSize
 	if brandSearch := c.Query("brandsearch"); brandSearch != "" {
-		brand:=database.Db.Raw("SElECT * FROM brands WHERE brands=?",brandSearch).Scan(&brandss)
+		brand := database.Db.Raw("SElECT * FROM brands WHERE brands=?", brandSearch).Scan(&brandss)
 		if brand.Error != nil {
 			c.JSON(400, gin.H{
 				"error": brand.Error.Error(),
@@ -40,7 +40,7 @@ func ListAllCategory(c *gin.Context) {
 		}
 	}
 	if categorySearch := c.Query("categorysearch"); categorySearch != "" {
-		category:= database.Db.Raw("SElECT * FROM categories WHERE Category=?",categorySearch).Scan(&categorys)
+		category := database.Db.Raw("SElECT * FROM categories WHERE Category=?", categorySearch).Scan(&categorys)
 		if category.Error != nil {
 			c.JSON(404, gin.H{
 				"err": category.Error.Error(),
@@ -51,8 +51,8 @@ func ListAllCategory(c *gin.Context) {
 	}
 	if sizeSearch := c.Query("sizesearch"); sizeSearch != "" {
 		Sizes, _ := strconv.Atoi(sizeSearch)
-		sizes:=uint(Sizes)
-		size:= database.Db.Raw("SElECT * FROM shoe_sizes WHERE size=?",sizes).Scan(&shoesizes)
+		sizes := uint(Sizes)
+		size := database.Db.Raw("SElECT * FROM shoe_sizes WHERE size=?", sizes).Scan(&shoesizes)
 		if size.Error != nil {
 			c.JSON(404, gin.H{
 				"err": size.Error.Error(),
@@ -212,6 +212,21 @@ func DeleteProductById(c *gin.Context) { //admin
 
 	c.JSON(200, gin.H{"msg": "deleted successfully"})
 }
+func ShowProductsID(c *gin.Context) {
+	var product models.Product
+	params := c.PostForm("product-name")
+	record := database.Db.Raw("select product_id from products where product_name=?", params).Scan(&product)
+	if record.Error != nil {
+		c.JSON(400, gin.H{
+			"err": record.Error.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":     "true",
+		"Product id": product,
+	})
+}
 func GetProductByID(c *gin.Context) { //user
 	params := c.Param("id")
 	// var product models.Product
@@ -224,7 +239,7 @@ func GetProductByID(c *gin.Context) { //user
 	c.JSON(200, gin.H{"product": Products})
 }
 
-func ProductView(c *gin.Context){
+func ProductView(c *gin.Context) {
 	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
 	fmt.Println(record)
 	if s := c.Query("search"); s != "" { //search
