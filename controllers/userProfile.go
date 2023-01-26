@@ -73,6 +73,7 @@ func AddAddress(c *gin.Context) {
 		House:     houseadd,
 		Land_mark: landmark,
 		City:      city,
+		Email:     userEmail,
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {

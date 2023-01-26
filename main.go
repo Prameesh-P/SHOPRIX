@@ -1,12 +1,11 @@
 package main
 
 import (
-	"github.com/Prameesh-P/SHOPRIX/routes"
-	"os"
-
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/initalizers"
+	"github.com/Prameesh-P/SHOPRIX/routes"
 	"github.com/gin-gonic/gin"
+	"os"
 )
 
 func init() {
