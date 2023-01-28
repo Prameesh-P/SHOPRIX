@@ -7,33 +7,37 @@ import (
 )
 
 type User struct {
-	ID            uint   `json:"id" gorm:"primaryKey;unique"  `
-	FirstName     string `json:"first_name" validate:"required,min=2,max=100"`
-	LastName      string `json:"last_name"  validate:"required,min=2,max=100"`
-	Email         string `json:"email" gorm:"unique" validate:"email,required" `
-	Password      string `json:"password" validate:"required,min=6"`
-	Phone         string `json:"phone"  validate:"required"`
-	BlockStatus   bool   `json:"block_Status" `
-	Country       string `json:"country"`
-	City          string `json:"city"`
-	Pincode       string `json:"pincode"`
-	LandMark      string `json:"landmark"`
-	WalletBalance uint   `json:"wallet_balance"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID          uint   `json:"id" gorm:"primaryKey;unique"  `
+	FirstName   string `json:"first_name" validate:"required,min=2,max=100"`
+	LastName    string `json:"last_name"  validate:"required,min=2,max=100"`
+	Email       string `json:"email" gorm:"unique" validate:"email,required" `
+	Password    string `json:"password" validate:"required,min=6"`
+	Phone       string `json:"phone"  validate:"required"`
+	BlockStatus bool   `json:"block_Status" `
+	Country     string `json:"country"`
+	City        string `json:"city"`
+	Pincode     string `json:"pincode"`
+	LandMark    string `json:"landmark"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+type Wallet struct {
+	id            uint
+	UserID        uint
+	WalletBalance uint `json:"wallet_balance"`
 }
 
 type Address struct {
 	AddressId uint   `json:"address_id" gorm:"primaryKey"  `
 	UserId    uint   `json:"user_id"  gorm:"not null" `
 	Name      string `json:"name"  gorm:"not null" `
-	PhoneNum  int    `json:"phone_number"  gorm:"not null" `
-	Pincode   int    `json:"pincode"  gorm:"not null" `
+	PhoneNum  int    `json:"phone_number" `
+	Pincode   int    `json:"pincode" `
 	House     string `json:"house"   `
 	Area      string `json:"area"   `
 	Email     string `json:"email"`
-	Land_mark string `json:"landmark"  gorm:"not null" `
-	City      string `json:"city"  gorm:"not null" `
+	Land_mark string `json:"landmark"   `
+	City      string `json:"city"  `
 }
 type Admin struct {
 	gorm.Model
@@ -155,10 +159,11 @@ type Applied_Coupons struct {
 	UserID      uint
 	Coupon_Code string `json:"coupon_code" `
 }
-type Charge struct {
-	gorm.Model
-	Amount       int64   `json:"amount"`
-	ReceiptEmail string  `json:"receiptMail"`
-	ProductName  string  `json:"productName"`
-	Address      Address `json:"address"`
-}
+
+//type Charge struct {
+//	gorm.Model
+//	Amount       int64   `json:"amount"`
+//	ReceiptEmail string  `json:"receiptMail"`
+//	ProductName  string  `json:"productName"`
+//	Address      Address `json:"address"`
+//}

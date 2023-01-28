@@ -34,3 +34,9 @@ func UserRoutes(routes *gin.Engine) {
 	routes.GET("/logout", middlewares.AdminAuth())
 	routes.GET("/forgetemail/:email", middlewares.UserAuth(), c.ForgetPasswordEmail)
 }
+func Setup() *gin.Engine {
+	router := gin.Default()
+	UserRoutes(router)
+	router.Run()
+	return router
+}

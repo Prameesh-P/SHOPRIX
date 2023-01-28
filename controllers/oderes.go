@@ -83,7 +83,7 @@ func ReturnOrders(c *gin.Context) {
 		return
 	}
 	var balance int
-	database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&balance)
+	database.Db.Raw("select wallet_balance from wallets where user_id=?", user.ID).Scan(&balance)
 	//tx := database.Db.Begin()
 	record := database.Db.Model(&models.OrderedItems{}).Where("orders_id=?", orderReturn.OrderId).Update("order_status", "returned")
 	if record.Error != nil {
@@ -95,7 +95,7 @@ func ReturnOrders(c *gin.Context) {
 		return
 	}
 	newBalance := balance + int(order.Total_amount)
-	record1 := database.Db.Model(&models.User{}).Where("id=?", user.ID).Update("wallet_balance", newBalance)
+	record1 := database.Db.Model(&models.Wallet{}).Where("user_id=?", user.ID).Update("wallet_balance", newBalance)
 	if record1.Error != nil {
 		//tx.Rollback()
 		c.JSON(404, gin.H{
@@ -126,9 +126,9 @@ func CancelOrders(c *gin.Context) {
 	var price int
 	database.Db.Raw("SELECT total_amount FROM ordered_items WHERE orders_id = ?", oderID).Scan(&price)
 	var balance int
-	database.Db.Raw("SELECT wallet_balance FROM users WHERE id = ?", user.ID).Scan(&balance)
+	database.Db.Raw("SELECT wallet_balance FROM wallets WHERE id = ?", user.ID).Scan(&balance)
 	newBalance := price + balance
-	database.Db.Raw("update users set wallet_balance=? where id=?", newBalance, user.ID).Scan(&user)
+	database.Db.Raw("update wallets set wallet_balance=? where id=?", newBalance, user.ID).Scan(&user)
 	c.JSON(200, gin.H{
 		"msg": "order cancelled",
 	})

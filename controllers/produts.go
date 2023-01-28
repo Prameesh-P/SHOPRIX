@@ -103,6 +103,7 @@ func ProductAdding(c *gin.Context) {
 	// images adding
 	imagepath, _ := c.FormFile("image")
 	extension := filepath.Ext(imagepath.Filename)
+	fmt.Printf("jgsdigj %s", extension)
 	image := uuid.New().String() + extension
 	c.SaveUploadedFile(imagepath, "./public/images"+image)
 	discont := c.Request.FormValue("discount")

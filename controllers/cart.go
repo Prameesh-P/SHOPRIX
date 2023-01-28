@@ -263,19 +263,19 @@ func CheckOut(c *gin.Context) {
 		})
 	}
 	//addressID == int(address.AddressId) &&
-
-	database.Db.Raw("select wallet_balance from users where id=?", user.ID).Scan(&user)
+	var wallets models.Wallet
+	database.Db.Raw("select wallet_balance from wallets where user_id=?", user.ID).Scan(&user)
 	if wallet == "use-wallet" && address.UserId == user.ID && PaymentMethod == "wallet" {
 		//fmt.Println("adsfasfas")
-		if user.WalletBalance > totalCartValue {
+		if wallets.WalletBalance > totalCartValue {
 			c.JSON(400, gin.H{
 				"msg": "can't apply wallet money on this transaction..Try another method..!!\n wallet money is low..",
 			})
 			c.Abort()
 			return
-		} else if user.WalletBalance > totalCartValue {
-			user.WalletBalance = user.WalletBalance - totalCartValue
-			database.Db.Model(&user).Where("id=?", user.ID).Update("wallet-balance", user.WalletBalance)
+		} else if wallets.WalletBalance > totalCartValue {
+			wallets.WalletBalance = wallets.WalletBalance - totalCartValue
+			database.Db.Model(&wallets).Where("user_id=?", user.ID).Update("wallet-balance", wallets.WalletBalance)
 			walletOrder := models.Orders{
 				UserId:         user.ID,
 				Order_id:       CreateOrderId(),

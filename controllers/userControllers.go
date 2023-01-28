@@ -169,7 +169,6 @@ func SentToEmail(from string, to []string, msg []byte) bool {
 }
 func ForgetPassword(c *gin.Context) {
 	UserEmail := c.Request.FormValue("useremail")
-
 	var user models.User
 	var count uint
 	Userotp := c.Request.FormValue("otp")
