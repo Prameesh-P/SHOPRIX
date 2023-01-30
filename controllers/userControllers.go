@@ -55,19 +55,19 @@ func Signup(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var body struct {
+	var Body struct {
 		Email    string
 		Password string
 	}
-	if c.ShouldBind(&body) != nil {
+	if c.ShouldBind(&Body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "failed to get request",
 		})
 		return
 	}
 	var user models.User
-	//result := database.Db.Where("email=?", body.Email).First(&user)
-	database.Db.First(&user, "email=?", body.Email)
+	//result := database.Db.Where("email=?", Body.Email).First(&user)
+	database.Db.First(&user, "email=?", Body.Email)
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",
@@ -81,7 +81,7 @@ func Login(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Body.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "wrong password",

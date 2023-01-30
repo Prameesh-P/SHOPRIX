@@ -8,7 +8,7 @@ import (
 
 func AdminRoutes(routes *gin.Engine) {
 	admin := routes.Group("/admin")
-
+	//admin.POST("/upload", c.UploadAnImage)
 	admin.POST("/signup", c.AdminSignup)
 	admin.POST("/login", c.AdminLogin)
 	admin.GET("/", middlewares.AdminAuth(), c.AdminHome)
@@ -20,7 +20,7 @@ func AdminRoutes(routes *gin.Engine) {
 	admin.POST("/addproducts", middlewares.AdminAuth(), c.ProductAdding)
 	admin.POST("/editproducts/:id", middlewares.AdminAuth(), c.EditProducts)
 	admin.DELETE("/deleteproducts/:id", middlewares.AdminAuth(), c.DeleteProductById)
-	admin.GET("/productsbyid/:id",middlewares.AdminAuth(),c.GetProductByID)
-	admin.GET("/productview",middlewares.AdminAuth(),c.ProductView)
-	admin.POST("/generate-coupens",middlewares.AdminAuth(),c.GenerateCoupens)
+	admin.GET("/productsbyid/:id", middlewares.AdminAuth(), c.GetProductByID)
+	admin.GET("/productview", middlewares.AdminAuth(), c.ProductView)
+	admin.POST("/generate-coupens", middlewares.AdminAuth(), c.GenerateCoupens)
 }

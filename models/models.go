@@ -10,7 +10,7 @@ type User struct {
 	ID          uint   `json:"id" gorm:"primaryKey;unique"  `
 	FirstName   string `json:"first_name" validate:"required,min=2,max=100"`
 	LastName    string `json:"last_name"  validate:"required,min=2,max=100"`
-	Email       string `json:"email" gorm:"unique" validate:"email,required" `
+	Email       string `json:"email" validate:"email,required" `
 	Password    string `json:"password" validate:"required,min=6"`
 	Phone       string `json:"phone"  validate:"required"`
 	BlockStatus bool   `json:"block_Status" `
@@ -160,10 +160,21 @@ type Applied_Coupons struct {
 	Coupon_Code string `json:"coupon_code" `
 }
 
-//type Charge struct {
-//	gorm.Model
-//	Amount       int64   `json:"amount"`
-//	ReceiptEmail string  `json:"receiptMail"`
-//	ProductName  string  `json:"productName"`
-//	Address      Address `json:"address"`
-//}
+//	type Charge struct {
+//		gorm.Model
+//		Amount       int64   `json:"amount"`
+//		ReceiptEmail string  `json:"receiptMail"`
+//		ProductName  string  `json:"productName"`
+//		Address      Address `json:"address"`
+//	}
+type Charge struct {
+	gorm.Model
+	Amount       int64  `json:"amount"`
+	ReceiptEmail string `json:"receiptMail"`
+	ProductName  string `json:"productName"`
+}
+
+func (c *Charge) TableName() string {
+	return "charge"
+
+}
