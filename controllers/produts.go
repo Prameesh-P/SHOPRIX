@@ -149,6 +149,30 @@ func ProductAdding(c *gin.Context) {
 		c.Abort()
 		return
 
+	case ".mp4":
+
+		c.JSON(400, gin.H{
+			"error": "you are selected file is video..!!! Please choose valid image file",
+		})
+		c.Abort()
+		return
+
+	case ".mp3":
+
+		c.JSON(400, gin.H{
+			"error": "you are selected file is audio..!!! Please choose valid image file",
+		})
+		c.Abort()
+		return
+
+	case ".mkv":
+
+		c.JSON(400, gin.H{
+			"error": "you are selected file is mkv..!!! Please choose valid image file",
+		})
+		c.Abort()
+		return
+
 	default:
 		c.JSON(400, gin.H{
 			"error": "You are selected file type is unknown..Please select valid image file..!!!!!",
