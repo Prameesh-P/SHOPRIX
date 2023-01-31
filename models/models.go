@@ -22,7 +22,7 @@ type User struct {
 	UpdatedAt   time.Time
 }
 type Wallet struct {
-	id            uint
+	id            int
 	UserID        uint
 	WalletBalance uint `json:"wallet_balance"`
 }

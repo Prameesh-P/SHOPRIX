@@ -303,5 +303,6 @@ func CheckOut(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"msg": "order Placed",
 	})
-
+	totalCartValue = 0
+	carts = nil
 }
