@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -112,55 +111,50 @@ func ProductAdding(c *gin.Context) {
 	// images adding
 	imagepath, _ := c.FormFile("image")
 	extension := filepath.Ext(imagepath.Filename)
-	//if err := c.Request.ParseMultipartForm(1024 * 1024 * 2); err != nil {
-	//	fmt.Println(c, "There was an error parsing the form values.")
-	//	return
-	//}
-	//img := Image{
-	//	Path:        filepath.Dir(imagepath.Filename),
-	//	Filename:    filepath.Base(imagepath.Filename),
-	//	Ext:         filepath.Ext(imagepath.Filename),
-	//	ContentType: imagepath.Header.Get("Content-Type"),
-	//}
-	//var acceptedImages = map[string]struct{}{
-	//	"image/png": struct{}{},
-	//	"image/jpg": struct{}{},
-	//}
-	//if _, err := os.Stat(watermarkStep.WatermarkImage); err != nil {
-	//	sl.ReportError(watermarkStep.WatermarkImage, "WatermarkImage", "WatermarkImage", "image not found", "")
-	//}
-	//if _, ok := acceptedImages[watermarkStep.ContentType]; !ok {
-	//	sl.ReportError(watermarkStep.ContentType, "ContentType", "ContentType", "unsupported image type", "")
-	//}
-	val, err := os.Open(imagepath.Filename)
-	if err != nil {
-		fmt.Println(err)
+	switch extension {
+
+	case ".jpg":
+
+		c.JSON(200, gin.H{
+			"status":  "true",
+			"message": "You are selected jpg file",
+		})
+
+	case ".gif":
+
+		c.JSON(200, gin.H{
+			"status":  "true",
+			"message": "You are selected gif file",
+		})
+
+	case ".png":
+
+		c.JSON(200, gin.H{
+			"status":  "true",
+			"message": "You are selected png file",
+		})
+
+	case ".jpeg":
+
+		c.JSON(200, gin.H{
+			"status":  "true",
+			"message": "You are selected jpg file",
+		})
+
+	case ".pdf":
+
+		c.JSON(400, gin.H{
+			"error": "you are selected file is pdf..!!! Please choose valid image file",
+		})
 		c.Abort()
-	}
+		return
 
-	buff := make([]byte, 512) // why 512 bytes ? see http://golang.org/pkg/net/http/#DetectContentType
-	_, err = val.Read(buff)
-	if err != nil {
-		fmt.Println(err)
-		c.Abort()
-	}
-	filetype := http.DetectContentType(buff)
-	fmt.Println(filetype)
-
-	switch filetype {
-	case ".public/images/jpeg", ".public/images/jpg":
-		fmt.Println(filetype)
-
-	case "image/gif":
-		fmt.Println(filetype)
-
-	case "image/png":
-		fmt.Println(filetype)
-
-	case "application/pdf": // not image, but application !
-		fmt.Println(filetype)
 	default:
-		fmt.Println("unknown file type uploaded")
+		c.JSON(400, gin.H{
+			"error": "You are selected file type is unknown..Please select valid image file..!!!!!",
+		})
+		c.Abort()
+		return
 	}
 
 	fmt.Printf("jgsdigj %s", extension)
