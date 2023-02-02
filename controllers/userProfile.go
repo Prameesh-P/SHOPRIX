@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strconv"
 )
 
 type Profile struct {

@@ -12,8 +12,8 @@ import (
 
 func Stripe(c *gin.Context) {
 	var user models.User
-	var json models.Charge
-	c.BindJSON(&json)
+	var payment models.Charge
+	c.BindJSON(&payment)
 	useremail := c.Request.FormValue("user")
 
 	// Set Stripe API key
@@ -22,26 +22,22 @@ func Stripe(c *gin.Context) {
 	database.Db.Raw("select id,phone from users where email=?", useremail).Scan(&user)
 	var sumtotal int
 	database.Db.Raw("select sum(total_price) from carts where user_id=?", user.ID).Scan(&sumtotal)
-	// Attempt to make the charge.
-	// We are setting the charge response to _
-	// as we are not using it.
+
 	_, err := charge.New(&stripe.ChargeParams{
-		Amount:       stripe.Int64(json.Amount),
+		Amount:       stripe.Int64(payment.Amount),
 		Currency:     stripe.String(string(stripe.CurrencyINR)),
-		Source:       &stripe.SourceParams{Token: stripe.String("tok_visa")}, // this should come from clientside
+		Source:       &stripe.SourceParams{Token: stripe.String("tok_visa")},
 		ReceiptEmail: stripe.String("prameepramee0@gmail.com")})
 
 	if err != nil {
-		// Handle any errors from attempt to charge
 		c.String(http.StatusBadRequest, "Request failed")
 		return
 	}
 	c.HTML(200, "app.html", gin.H{
 
-		"UserID":      user.ID,
-		"total_price": sumtotal,
-		"total":       sumtotal,
-		//"orderid":      value,
+		"UserID":       user.ID,
+		"total_price":  sumtotal,
+		"total":        sumtotal,
 		"amount":       sumtotal,
 		"Email":        useremail,
 		"Phone_Number": user.Phone,

@@ -3,6 +3,7 @@ package middlewares
 import (
 	"github.com/Prameesh-P/SHOPRIX/authentification"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func AdminAuth() gin.HandlerFunc {
@@ -10,7 +11,7 @@ func AdminAuth() gin.HandlerFunc {
 
 		tokenString, err := context.Cookie("AdminJWT")
 		if tokenString == "" {
-			context.JSON(401, gin.H{"error": "request does not contain an access token"})
+			context.JSON(http.StatusUnauthorized, gin.H{"error": "request does not contain an access token"})
 			context.Abort()
 			return
 		}

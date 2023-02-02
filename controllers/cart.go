@@ -183,6 +183,7 @@ var Address []struct {
 	Landmark     string
 	City         string
 }
+var Flag = 0
 
 func CheckOut(c *gin.Context) {
 	var user models.User
@@ -208,7 +209,6 @@ func CheckOut(c *gin.Context) {
 	//fmt.Printf("codd..%s", cod)
 	//razorpay := "RazorPay"
 	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalCartValue)
-
 	if PaymentMethod == "COD" {
 		fmt.Println(carts)
 		fmt.Println("hyyyyyyyy..............")
@@ -251,10 +251,6 @@ func CheckOut(c *gin.Context) {
 	}
 	database.Db.Raw("select address_id,user_id,name from addresses where address_id=?", addressID).Scan(&address)
 
-	c.JSON(300, gin.H{
-		"address":          Address,
-		"total cart value": totalCartValue,
-	})
 	fmt.Printf("users %d", user.ID)
 	fmt.Printf("address %d", address.UserId)
 	if address.UserId != user.ID {
@@ -293,16 +289,27 @@ func CheckOut(c *gin.Context) {
 				})
 				c.Abort()
 			}
-			totalCartValue = 0
 			var orderedItems models.OrderedItems
 			database.Db.Raw("update orderd_items set  order_status=?,payment_status=?,payment_method=? where user_id=?", "orderplaced", "payment completed", "wallet", user.ID).Scan(&orderedItems)
 
 		}
 
 	}
+	if Flag > 0 {
+		c.JSON(400, gin.H{
+			"msg": "item already placed",
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"msg": "order Placed",
 	})
+
+	c.JSON(300, gin.H{
+		"address":          Address,
+		"total cart value": totalCartValue,
+	})
+	Flag++
 	totalCartValue = 0
 	carts = nil
 }

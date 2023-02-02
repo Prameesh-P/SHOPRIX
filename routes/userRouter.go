@@ -19,7 +19,7 @@ func UserRoutes(routes *gin.Engine) {
 		user.GET("/view-products", middlewares.UserAuth(), c.ProductView)
 		user.POST("/addtocart", middlewares.UserAuth(), c.AddToCart)
 		user.GET("/viewcart", middlewares.UserAuth(), c.ViewCart)
-		user.POST("/payment", middlewares.UserAuth(), c.Stripe)
+		user.GET("/payment", middlewares.UserAuth(), c.Stripe)
 		user.POST("/checkoutAddress", middlewares.UserAuth(), c.CheckOutAddress)
 		user.GET("/checkout", middlewares.UserAuth(), c.CheckOut)
 		user.GET("/vieworder", middlewares.UserAuth(), c.ViewOrders)
@@ -35,10 +35,4 @@ func UserRoutes(routes *gin.Engine) {
 	routes.GET("/logout", middlewares.AdminAuth())
 	routes.GET("/forgetemail/:email", middlewares.UserAuth(), c.ForgetPasswordEmail)
 	routes.GET("/app", Service.Tes)
-}
-func Setup() *gin.Engine {
-	router := gin.Default()
-	UserRoutes(router)
-	router.Run()
-	return router
 }

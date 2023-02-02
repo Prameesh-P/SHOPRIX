@@ -88,13 +88,13 @@ func ApplyDiscount(c *gin.Context) {
 }
 
 func ProductAdding(c *gin.Context) {
-	type Image struct {
-		Path        string `validate:"required"`
-		Filename    string `validate:"required"`
-		Ext         string `validate:"required"`
-		ContentType string `validate:"required"`
-		Bytes       int32  `validate:"required,gt=0"`
-	}
+	//type Image struct {
+	//	Path        string `validate:"required"`
+	//	Filename    string `validate:"required"`
+	//	Ext         string `validate:"required"`
+	//	ContentType string `validate:"required"`
+	//	Bytes       int32  `validate:"required,gt=0"`
+	//}
 	prodname := c.Request.FormValue("productname")
 	price := c.Request.FormValue("price")
 	Price, _ := strconv.Atoi(price)
@@ -293,6 +293,7 @@ func DeleteProductById(c *gin.Context) { //admin
 func ShowProductsID(c *gin.Context) {
 	var product models.Product
 	params := c.PostForm("product-name")
+	fmt.Println(params)
 	record := database.Db.Raw("select product_id from products where product_name=?", params).Scan(&product)
 	if record.Error != nil {
 		c.JSON(400, gin.H{
@@ -302,11 +303,12 @@ func ShowProductsID(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"status":     "true",
-		"Product id": product,
+		"Product id": product.ProductId,
 	})
 }
 func GetProductByID(c *gin.Context) { //user
-	params := c.Param("id")
+	params := c.Request.FormValue("id")
+	fmt.Println(params)
 	// var product models.Product
 	record := database.Db.Raw("SELECT product_id,product_name,price,image,color,stock,brands.brands FROM products join brands on products.brand_id = brands.id where product_id=?", params).Scan(&Products)
 	if record.Error != nil {
@@ -320,10 +322,10 @@ func GetProductByID(c *gin.Context) { //user
 func ProductView(c *gin.Context) {
 	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
 	fmt.Println(record)
-	if s := c.Query("search"); s != "" { //search
+	if s := c.Request.FormValue("search"); s != "" { //search
 		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id where product_name like ?", "%"+s+"%").Scan(&Products)
 	}
-	if sort := c.Query("sort"); sort != "" { //sort
+	if sort := c.Request.FormValue("sort"); sort != "" { //sort
 		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id  order by price ?", sort).Scan(&Products)
 	}
 	c.JSON(200, gin.H{
