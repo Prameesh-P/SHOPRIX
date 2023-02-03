@@ -6,6 +6,7 @@ import (
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -30,6 +31,7 @@ func CreateOrderId() string {
 	id := strconv.Itoa(value)
 	orderID := "OID" + id
 	return orderID
+
 }
 func ViewOrders(c *gin.Context) {
 	var user models.User
@@ -68,12 +70,13 @@ func ReturnOrders(c *gin.Context) {
 		OrderId string
 	}
 	if err := c.BindJSON(&orderReturn); err != nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		c.Abort()
 		return
 	}
+
 	database.Db.Where("orders_id=?", orderReturn.OrderId).Find(&order)
 	if order.Order_Status == "returned" {
 		c.JSON(400, gin.H{
@@ -94,6 +97,14 @@ func ReturnOrders(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	//query := database.Db.Raw("delete from ordered_items where order_id=?",orderReturn.OrderId)
+	//if query.Error != nil {
+	//	c.JSON(400, gin.H{
+	//		"error": query.Error.Error(),
+	//	})
+	//	c.Abort()
+	//	return
+	//}
 	newBalance := balance + int(order.Total_amount)
 	record1 := database.Db.Model(&models.Wallet{}).Where("user_id=?", user.ID).Update("wallet_balance", newBalance)
 	if record1.Error != nil {
@@ -108,6 +119,8 @@ func ReturnOrders(c *gin.Context) {
 }
 func CancelOrders(c *gin.Context) {
 	var user models.User
+	var returned string
+	var returns = "returned"
 	userEmail := c.Query("user")
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	oderID := c.Query("orderid")
@@ -115,6 +128,14 @@ func CancelOrders(c *gin.Context) {
 	database.Db.Where("orders_id=?", oderID).Find(&orders)
 	fmt.Println(orders.Order_Status, orders.OrdersID)
 	fmt.Println(oderID)
+	database.Db.Raw("select order_status from ordered_items where order_status=?", returns).Scan(&returned)
+	if returned != "" {
+		c.JSON(400, gin.H{
+			"message": "Can't cancel products..!! Because order is already returned",
+		})
+		c.Abort()
+		return
+	}
 	if orders.Order_Status == "order cancelled" {
 		c.JSON(400, gin.H{
 			"status": "false",

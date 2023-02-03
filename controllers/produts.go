@@ -110,76 +110,86 @@ func ProductAdding(c *gin.Context) {
 	Size, _ := strconv.Atoi(size)
 	// images adding
 	imagepath, _ := c.FormFile("image")
+	//im, err := filepath.Abs(imagepath.Filename)
+	//if err != nil {
+	//	c.JSON(http.StatusBadRequest, gin.H{
+	//		"error": err.Error(),
+	//	})
+	//	c.Abort()
+	//	return
+	//}
+	//imgVal := ImageValidation(im)
+	//fmt.Println(imgVal)
 	extension := filepath.Ext(imagepath.Filename)
-	switch extension {
-
-	case ".jpg":
-
-		c.JSON(200, gin.H{
-			"status":  "true",
-			"message": "You are selected jpg file",
-		})
-
-	case ".gif":
-
-		c.JSON(200, gin.H{
-			"status":  "true",
-			"message": "You are selected gif file",
-		})
-
-	case ".png":
-
-		c.JSON(200, gin.H{
-			"status":  "true",
-			"message": "You are selected png file",
-		})
-
-	case ".jpeg":
-
-		c.JSON(200, gin.H{
-			"status":  "true",
-			"message": "You are selected jpg file",
-		})
-
-	case ".pdf":
-
-		c.JSON(400, gin.H{
-			"error": "you are selected file is pdf..!!! Please choose valid image file",
-		})
-		c.Abort()
-		return
-
-	case ".mp4":
-
-		c.JSON(400, gin.H{
-			"error": "you are selected file is video..!!! Please choose valid image file",
-		})
-		c.Abort()
-		return
-
-	case ".mp3":
-
-		c.JSON(400, gin.H{
-			"error": "you are selected file is audio..!!! Please choose valid image file",
-		})
-		c.Abort()
-		return
-
-	case ".mkv":
-
-		c.JSON(400, gin.H{
-			"error": "you are selected file is mkv..!!! Please choose valid image file",
-		})
-		c.Abort()
-		return
-
-	default:
-		c.JSON(400, gin.H{
-			"error": "You are selected file type is unknown..Please select valid image file..!!!!!",
-		})
-		c.Abort()
-		return
-	}
+	//switch extension {
+	//
+	//case ".jpg":
+	//
+	//	c.JSON(200, gin.H{
+	//		"status":  "true",
+	//		"message": "You are selected jpg file",
+	//	})
+	//
+	//case ".gif":
+	//
+	//	c.JSON(200, gin.H{
+	//		"status":  "true",
+	//		"message": "You are selected gif file",
+	//	})
+	//
+	//case ".png":
+	//
+	//	c.JSON(200, gin.H{
+	//		"status":  "true",
+	//		"message": "You are selected png file",
+	//	})
+	//
+	//case ".jpeg":
+	//
+	//	c.JSON(200, gin.H{
+	//		"status":  "true",
+	//		"message": "You are selected jpg file",
+	//	})
+	//
+	//case ".pdf":
+	//
+	//	c.JSON(400, gin.H{
+	//		"error": "you are selected file is pdf..!!! Please choose valid image file",
+	//	})
+	//	c.Abort()
+	//	return
+	//
+	//case ".mp4":
+	//
+	//	c.JSON(400, gin.H{
+	//		"error": "you are selected file is video..!!! Please choose valid image file",
+	//	})
+	//	c.Abort()
+	//	return
+	//
+	//case ".mp3":
+	//
+	//	c.JSON(400, gin.H{
+	//		"error": "you are selected file is audio..!!! Please choose valid image file",
+	//	})
+	//	c.Abort()
+	//	return
+	//
+	//case ".mkv":
+	//
+	//	c.JSON(400, gin.H{
+	//		"error": "you are selected file is mkv..!!! Please choose valid image file",
+	//	})
+	//	c.Abort()
+	//	return
+	//
+	//default:
+	//	c.JSON(400, gin.H{
+	//		"error": "You are selected file type is unknown..Please select valid image file..!!!!!",
+	//	})
+	//	c.Abort()
+	//	return
+	//}
 
 	fmt.Printf("jgsdigj %s", extension)
 	image := uuid.New().String() + extension

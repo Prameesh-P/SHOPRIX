@@ -135,7 +135,6 @@ type Orders struct {
 }
 type Coupon struct {
 	gorm.Model
-
 	Coupon_Code string `json:"coupon_code"`
 	Discount    uint   `json:"discount"`
 	Quantity    uint   `json:"quantity"`

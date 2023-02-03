@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Prameesh-P/SHOPRIX/controllers"
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/initalizers"
 	"github.com/Prameesh-P/SHOPRIX/middlewares"
@@ -16,6 +17,7 @@ func init() {
 }
 
 func main() {
+	controllers.ImageResizing()
 
 	port := os.Getenv("PORT")
 	if port == "" {
