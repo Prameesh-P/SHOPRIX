@@ -16,13 +16,13 @@ func AdminSignup(c *gin.Context) {
 		Password string
 	}
 	if err := c.ShouldBind(&Admin); err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 	}
 	i.Db.Raw("SELECT count(*) FROM admins WHERE email=?", admin.Email).Scan(&count)
 	if count > 0 {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": "false",
 			"msg": "Admin with same Email already exists",
 		})
@@ -40,11 +40,11 @@ func AdminSignup(c *gin.Context) {
 	admins := models.Admin{Email: Admin.Email, Password: bytes}
 	record := i.Db.Create(&admins)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "failed to create Admin",
 		})
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": "OK",
 	})
 }
@@ -54,7 +54,7 @@ func AdminLogin(c *gin.Context) {
 		Password string
 	}
 	if err := c.ShouldBind(&admin); err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 	}
@@ -68,7 +68,7 @@ func AdminLogin(c *gin.Context) {
 	}
 	err := admins.CheckPassword(admin.Password)
 	if err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": "Password was wrong..!!!",
 		})
 		c.Abort()
@@ -79,13 +79,13 @@ func AdminLogin(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("AdminJWT", token, 3600*24*30, "", "", false, true)
 	if err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status":      "true",
 		"msg":         "OK",
 		"tokenString": tokenString,
@@ -93,7 +93,7 @@ func AdminLogin(c *gin.Context) {
 }
 
 func AdminHome(c *gin.Context) {
-	c.JSON(202, gin.H{
+	c.JSON(http.StatusAccepted, gin.H{
 		"status": "Welcome to admin home page ",
 	})
 }
@@ -106,7 +106,7 @@ func LogoutUser(c *gin.Context) {
 		return
 	}
 	c.SetCookie("AdminJWT", token, 0, "", "", false, true)
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"success": "logout successfully",
 	})
 }
@@ -121,11 +121,10 @@ type UserDataStruct struct {
 
 func UserData(c *gin.Context) {
 	var user UserDataStruct
-	//i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users ORDER BY id ASC").Scan(&user)
 	if search := c.Query("search"); search != "" {
 		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users where first_name like ? ORDER BY id ASC ", search).Scan(&user)
 	}
-	c.JSON(200, gin.H{"user": user})
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 func BlockUser(c *gin.Context) {
 	params := c.Param("id")

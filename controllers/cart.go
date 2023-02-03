@@ -32,7 +32,7 @@ func AddToCart(c *gin.Context) {
 	}
 	record1 := database.Db.Create(&cart)
 	if record1.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": record1.Error.Error(),
 		})
 		c.Abort()
@@ -157,7 +157,7 @@ func CheckOutAddress(c *gin.Context) {
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": record.Error.Error(),
 		})
 		c.Abort()
@@ -306,7 +306,7 @@ func CheckOut(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"msg":              "order Placed",
 		"total_cart_value": totalCartValue,
 	})

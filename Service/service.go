@@ -4,6 +4,7 @@ import (
 	"github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func SavePayment(charge *models.Charge) (err error) {
@@ -14,5 +15,5 @@ func SavePayment(charge *models.Charge) (err error) {
 
 }
 func Tes(c *gin.Context) {
-	c.HTML(200, "app.html", nil)
+	c.HTML(http.StatusOK, "app.html", nil)
 }

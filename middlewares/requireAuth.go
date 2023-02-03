@@ -17,7 +17,7 @@ func AdminAuth() gin.HandlerFunc {
 		}
 		err = authentification.ValidateToken(tokenString)
 		if err != nil {
-			context.JSON(401, gin.H{"error": err.Error()})
+			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			context.Abort()
 			return
 		}
@@ -28,7 +28,7 @@ func UserAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenString, err := context.Cookie("UserJWT")
 		if tokenString == "" {
-			context.JSON(401, gin.H{
+			context.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Request does not contain an access token",
 			})
 			context.Abort()
@@ -37,7 +37,7 @@ func UserAuth() gin.HandlerFunc {
 		err = authentification.ValidateToken(tokenString)
 		context.Set("user", authentification.P)
 		if err != nil {
-			context.JSON(401, gin.H{
+			context.JSON(http.StatusUnauthorized, gin.H{
 				"error": err.Error(),
 			})
 			context.Abort()
