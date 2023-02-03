@@ -35,7 +35,7 @@ import (
 //
 //		return ""
 //	}
-func ImageResizing() {
+func ImageResizing() *image.NRGBA {
 
 	src, err := imaging.Open("me.jpg")
 	if err != nil {
@@ -56,4 +56,5 @@ func ImageResizing() {
 	if err != nil {
 		log.Fatalf("failed to save image: %v", err)
 	}
+	return dst
 }

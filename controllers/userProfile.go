@@ -76,13 +76,13 @@ func AddAddress(c *gin.Context) {
 	}
 	record := database.Db.Create(&address)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": record.Error.Error(),
 		})
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"msg": "Address Added",
 	})
 }

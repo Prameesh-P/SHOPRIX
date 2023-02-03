@@ -32,7 +32,7 @@ func ListAllCategory(c *gin.Context) {
 	if brandSearch := c.Query("brandsearch"); brandSearch != "" {
 		brand := database.Db.Raw("SElECT * FROM brands WHERE brands=?", brandSearch).Scan(&brandss)
 		if brand.Error != nil {
-			c.JSON(400, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"error": brand.Error.Error(),
 			})
 			c.Abort()
@@ -42,7 +42,7 @@ func ListAllCategory(c *gin.Context) {
 	if categorySearch := c.Query("categorysearch"); categorySearch != "" {
 		category := database.Db.Raw("SElECT * FROM categories WHERE Category=?", categorySearch).Scan(&categorys)
 		if category.Error != nil {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"err": category.Error.Error(),
 			})
 			c.Abort()
@@ -54,14 +54,14 @@ func ListAllCategory(c *gin.Context) {
 		sizes := uint(Sizes)
 		size := database.Db.Raw("SElECT * FROM shoe_sizes WHERE size=?", sizes).Scan(&shoesizes)
 		if size.Error != nil {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"err": size.Error.Error(),
 			})
 			c.Abort()
 			return
 		}
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"available brands":     brandss,
 		"available categories": categorys,
 		"available sizes":      shoesizes,
@@ -79,22 +79,15 @@ func ApplyDiscount(c *gin.Context) {
 	}
 	record := database.Db.Model(&models.Brand{}).Where("id=?", brand.Brand_id).Update("discount", brand.Discount)
 	if record.Error == nil {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"discount": brand.Discount,
 			"msg":      "Brand discount added succesfully",
 		})
-
 	}
 }
 
 func ProductAdding(c *gin.Context) {
-	//type Image struct {
-	//	Path        string `validate:"required"`
-	//	Filename    string `validate:"required"`
-	//	Ext         string `validate:"required"`
-	//	ContentType string `validate:"required"`
-	//	Bytes       int32  `validate:"required,gt=0"`
-	//}
+
 	prodname := c.Request.FormValue("productname")
 	price := c.Request.FormValue("price")
 	Price, _ := strconv.Atoi(price)
@@ -110,16 +103,6 @@ func ProductAdding(c *gin.Context) {
 	Size, _ := strconv.Atoi(size)
 	// images adding
 	imagepath, _ := c.FormFile("image")
-	//im, err := filepath.Abs(imagepath.Filename)
-	//if err != nil {
-	//	c.JSON(http.StatusBadRequest, gin.H{
-	//		"error": err.Error(),
-	//	})
-	//	c.Abort()
-	//	return
-	//}
-	//imgVal := ImageValidation(im)
-	//fmt.Println(imgVal)
 	extension := filepath.Ext(imagepath.Filename)
 	//switch extension {
 	//
@@ -202,13 +185,13 @@ func ProductAdding(c *gin.Context) {
 	// inserting brand discount on to the products
 	insert := database.Db.Raw("update brands set discount=? where id=?", brandDiscount, brands).Scan(&models.Brand{})
 	if insert.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": insert.Error.Error(),
 		})
 		c.Abort()
 		return
 	}
-	// comparing whcih type of discount is greater
+	// comparing which type of discount is greater
 	if brandDiscount > discount {
 		Discount = (Price * brandDiscount) / 100
 	} else {
@@ -218,13 +201,12 @@ func ProductAdding(c *gin.Context) {
 	database.Db.Raw("select count(*) from products where product_name=?", prodname).Scan(&count)
 	fmt.Println(count)
 	if count > 0 {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "A product with same name already exists",
 		})
 		c.Abort()
 		return
 	}
-	// fmt.Println(Discount)
 	product := models.Product{
 		ProductName: prodname,
 		Price:       uint(Price),
@@ -240,15 +222,15 @@ func ProductAdding(c *gin.Context) {
 	}
 	record := database.Db.Create(&product)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"msg": "product already exists",
 		})
 		c.Abort()
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"msg": "added succesfully",
+	c.JSON(http.StatusOK, gin.H{
+		"msg": "added_successfully",
 	})
 }
 
@@ -263,7 +245,7 @@ func EditProducts(c *gin.Context) { //admin
 	params := c.Param("id")
 	var editProducts EditProductsData
 	if err := c.ShouldBindJSON(&editProducts); err != nil {
-		c.JSON(404, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
@@ -271,11 +253,11 @@ func EditProducts(c *gin.Context) { //admin
 	record := database.Db.Model(products).Where("product_id=?", params).Updates(models.Product{ProductName: editProducts.ProductName,
 		Price: editProducts.Price, Color: editProducts.Color})
 	if record.Error != nil {
-		c.JSON(404, gin.H{"error": record.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": record.Error.Error()})
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{"msg": "updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "updated_successfully"})
 
 }
 func DeleteProductById(c *gin.Context) { //admin
@@ -284,8 +266,8 @@ func DeleteProductById(c *gin.Context) { //admin
 	var count uint
 	database.Db.Raw("select count(product_id) from products where product_id=?", params).Scan(&count)
 	if count <= 0 {
-		c.JSON(404, gin.H{
-			"msg": "product doesnot exist",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"msg": "product does not exist",
 		})
 		c.Abort()
 		return
@@ -293,12 +275,12 @@ func DeleteProductById(c *gin.Context) { //admin
 
 	record := database.Db.Raw("delete from products where product_id=?", params).Scan(&products)
 	if record.Error != nil {
-		c.JSON(404, gin.H{"error": record.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": record.Error.Error()})
 		c.Abort()
 		return
 	}
 
-	c.JSON(200, gin.H{"msg": "deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "deleted successfully"})
 }
 func ShowProductsID(c *gin.Context) {
 	var product models.Product
@@ -306,7 +288,7 @@ func ShowProductsID(c *gin.Context) {
 	fmt.Println(params)
 	record := database.Db.Raw("select product_id from products where product_name=?", params).Scan(&product)
 	if record.Error != nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": record.Error.Error(),
 		})
 		return
@@ -322,11 +304,11 @@ func GetProductByID(c *gin.Context) { //user
 	// var product models.Product
 	record := database.Db.Raw("SELECT product_id,product_name,price,image,color,stock,brands.brands FROM products join brands on products.brand_id = brands.id where product_id=?", params).Scan(&Products)
 	if record.Error != nil {
-		c.JSON(404, gin.H{"err": record.Error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"err": record.Error.Error()})
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{"product": Products})
+	c.JSON(http.StatusOK, gin.H{"product": Products})
 }
 
 func ProductView(c *gin.Context) {
@@ -338,7 +320,7 @@ func ProductView(c *gin.Context) {
 	if sort := c.Request.FormValue("sort"); sort != "" { //sort
 		database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id  order by price ?", sort).Scan(&Products)
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"products": Products,
 	})
 }

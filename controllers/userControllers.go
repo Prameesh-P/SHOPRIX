@@ -66,7 +66,6 @@ func Login(c *gin.Context) {
 		return
 	}
 	var user models.User
-	//result := database.Db.Where("email=?", Body.Email).First(&user)
 	database.Db.First(&user, "email=?", Body.Email)
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -75,7 +74,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	if user.BlockStatus {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"msg": "user has been Blocked by admin",
 		})
 		c.Abort()
@@ -108,7 +107,7 @@ func Login(c *gin.Context) {
 	})
 }
 func UserHome(c *gin.Context) {
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"success": "Welcome to user home page..!!",
 	})
 }
@@ -129,9 +128,7 @@ func OtpGenerator() string {
 
 func ForgetPasswordEmail(c *gin.Context) {
 	otps := OtpGenerator()
-	// var user models.User
 	params := c.Param("email")
-	// var user models.User
 	from := "prameepramee0@gmail.com"
 	to := []string{params}
 	msg := []byte("To:" + params + "\r\n" +
@@ -147,7 +144,7 @@ func ForgetPasswordEmail(c *gin.Context) {
 			"msg":     "Verification sent on email successfully",
 		})
 	} else {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Please check your Email..!!",
 		})
 		c.Abort()
@@ -179,7 +176,6 @@ func ForgetPassword(c *gin.Context) {
 	fmt.Println(UserOtps)
 	NewPassword := c.Request.FormValue("password")
 	database.Db.Raw("select count(*) from users where email=?", UserEmail).Scan(&count)
-	// user.Password=NewPassword
 	if count <= 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "sorry we cant find no user with this email..!!",
@@ -195,14 +191,14 @@ func ForgetPassword(c *gin.Context) {
 		return
 	}
 	if err := user.HashPassword(NewPassword); err != nil {
-		c.JSON(404, gin.H{"err": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		c.Abort()
 		return
 	}
 	fmt.Println(user.HashPassword(NewPassword))
 	hash, err := bcrypt.GenerateFromPassword([]byte(NewPassword), 10)
 	if err != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"err": "failed to hash",
 		})
 		c.Abort()
@@ -212,14 +208,13 @@ func ForgetPassword(c *gin.Context) {
 	fmt.Println(UserEmail)
 	fmt.Println(NewPassword)
 	if Otps == UserOtps {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"success":     "true",
 			"UserEmail":   UserEmail,
 			"NewPassword": NewPassword,
 		})
 	} else {
-		c.JSON(404, gin.H{
-
+		c.JSON(http.StatusNotFound, gin.H{
 			"error": "error",
 		})
 	}
@@ -234,7 +229,7 @@ func Validate(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": "true",
 		"user":   User,
 	})

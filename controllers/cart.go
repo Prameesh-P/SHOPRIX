@@ -56,14 +56,14 @@ func AddToCart(c *gin.Context) {
 	}
 	record := database.Db.Create(&cart)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"err": record.Error.Error(),
 		})
-		c.Abort()
+		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 	database.Db.Raw("select product_name,brands.brand from products join carts.product_id=products.product_id join brands on brands.id=products.brand_id where products.product_id=?", ProductDetails.ProductID).Scan(&cart)
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"userId": user.ID,
 		"msg":    "added to cart",
 	})
@@ -99,7 +99,7 @@ func ViewCart(c *gin.Context) {
 	}
 	record := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&cartss)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"err": record.Error.Error(),
 		})
 		c.Abort()
@@ -107,15 +107,11 @@ func ViewCart(c *gin.Context) {
 	}
 	for _, v := range cartss {
 		productID := v.ProductId
-		//ProdctId,_:=strconv.Atoi(productID)
 		userID := v.UserId
-		//UserId,_:=strconv.Atoi(userID)
 		ProName := v.ProductName
 		quantity := v.Quantity
-		//Quantity,_:=strconv.Atoi(quantity)
 		PEmail := v.Email
 		Tprice := v.TotalPrice
-		//TotalPriceL,_:=strconv.Atoi(Tprice)
 		carts := models.Cartsinfo{
 			User_id:      userID,
 			Product_id:   productID,
@@ -130,9 +126,9 @@ func ViewCart(c *gin.Context) {
 
 	fmt.Println(cartss)
 	database.Db.Raw("select sum(total_price) as total from carts where user_id=?", user.ID).Scan(&totalcartvalue)
-	c.JSON(200, gin.H{
-		"cartss": cartss,
-		"total":  totalcartvalue,
+	c.JSON(http.StatusOK, gin.H{
+		"carts": cartss,
+		"total": totalcartvalue,
 	})
 }
 func CheckOutAddress(c *gin.Context) {
@@ -194,7 +190,7 @@ func CheckOut(c *gin.Context) {
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	precord := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&carts)
 	if precord.Error != nil {
-		c.JSON(404, gin.H{"err": precord.Error.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"err": precord.Error.Error()})
 		c.Abort()
 		return
 	}
@@ -229,7 +225,7 @@ func CheckOut(c *gin.Context) {
 
 		}
 		if Flag > 0 {
-			c.JSON(400, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"msg": "item already placed",
 			})
 			return
@@ -237,15 +233,15 @@ func CheckOut(c *gin.Context) {
 		var orderstas string
 		database.Db.Raw("select order_status from ordered_items where order_status=?", "confirmed").Scan(&orderstas)
 		if orderstas == "order cancelled" {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "Already cancelled item",
 			})
 		} else if orderstas == "returned" {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "Already returned item",
 			})
 		}
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"msg": "Cash on delivery placed..!!",
 		})
 		Flag++
@@ -254,7 +250,7 @@ func CheckOut(c *gin.Context) {
 
 	record := database.Db.Raw("select address_id, user_id,name,phone_num,pincode,house,area,land_mark,city from addresses where user_id=?", user.ID).Scan(&Address)
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"err": record.Error.Error(),
 		})
 		c.Abort()
@@ -263,7 +259,7 @@ func CheckOut(c *gin.Context) {
 
 	database.Db.Raw("select address_id,user_id,name from addresses where address_id=?", addressID).Scan(&address)
 	if address.UserId != user.ID {
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"msg": "enter valid address id",
 		})
 	}
@@ -273,7 +269,7 @@ func CheckOut(c *gin.Context) {
 	if wallet == "use-wallet" && address.UserId == user.ID && PaymentMethod == "wallet" {
 		//fmt.Println("adsfasfas")
 		if wallets.WalletBalance > totalCartValue {
-			c.JSON(400, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"msg": "can't apply wallet money on this transaction..Try another method..!!\n wallet money is low..",
 			})
 			c.Abort()
@@ -293,7 +289,7 @@ func CheckOut(c *gin.Context) {
 
 			query := database.Db.Create(&walletOrder)
 			if query.Error != nil {
-				c.JSON(400, gin.H{
+				c.JSON(http.StatusBadRequest, gin.H{
 					"err": query.Error.Error(),
 				})
 				c.Abort()
@@ -305,7 +301,7 @@ func CheckOut(c *gin.Context) {
 	}
 
 	if Flag > 0 {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "item already placed",
 		})
 		return

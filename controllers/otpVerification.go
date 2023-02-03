@@ -37,7 +37,7 @@ func OtpLog(c *gin.Context) {
 	result := CheckNumber(Mob)
 
 	if !result {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "false",
 			"msg":    "Mobile number does not exists..!! Please signup",
 		})
@@ -51,12 +51,12 @@ func OtpLog(c *gin.Context) {
 	response, err := client.VerifyV2.CreateVerification(serviceSid, params)
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Error sending otp",
 		})
 	} else {
 		fmt.Printf("Sent Verification '%s'\n", *response.Sid)
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status": "true",
 			"msg":    "OTP sent successfully..!!",
 		})
@@ -113,7 +113,7 @@ func CheckOTP(c *gin.Context) {
 		})
 	} else {
 
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "otp is invalid",
 		})
 	}

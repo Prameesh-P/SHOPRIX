@@ -31,7 +31,6 @@ func CreateOrderId() string {
 	id := strconv.Itoa(value)
 	orderID := "OID" + id
 	return orderID
-
 }
 func ViewOrders(c *gin.Context) {
 	var user models.User
@@ -42,7 +41,7 @@ func ViewOrders(c *gin.Context) {
 	if search := c.PostForm("search"); search != "" {
 		query := database.Db.Raw("select user_id,product_id,product_name,applied_coupons,price,orders_id,order_status,payment_status,payment_method,total_amount from ordered_items where (product_name ilike ? or payment_method ilike ? )and user_id=? ", "%"+search+"%", "%"+search+"%", user.ID).Scan(&ordered_items)
 		if query.Error != nil {
-			c.JSON(404, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"err": query.Error.Error(),
 			})
 			c.Abort()
@@ -50,13 +49,13 @@ func ViewOrders(c *gin.Context) {
 		}
 	}
 	if record.Error != nil {
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": record.Error.Error(),
 		})
 		c.Abort()
 		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"orders": ordered_items,
 	})
 }
@@ -79,7 +78,7 @@ func ReturnOrders(c *gin.Context) {
 
 	database.Db.Where("orders_id=?", orderReturn.OrderId).Find(&order)
 	if order.Order_Status == "returned" {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "Item already returned",
 		})
 		c.Abort()
@@ -91,20 +90,12 @@ func ReturnOrders(c *gin.Context) {
 	record := database.Db.Model(&models.OrderedItems{}).Where("orders_id=?", orderReturn.OrderId).Update("order_status", "returned")
 	if record.Error != nil {
 		//tx.Rollback()
-		c.JSON(404, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"err": record.Error.Error(),
 		})
 		c.Abort()
 		return
 	}
-	//query := database.Db.Raw("delete from ordered_items where order_id=?",orderReturn.OrderId)
-	//if query.Error != nil {
-	//	c.JSON(400, gin.H{
-	//		"error": query.Error.Error(),
-	//	})
-	//	c.Abort()
-	//	return
-	//}
 	newBalance := balance + int(order.Total_amount)
 	record1 := database.Db.Model(&models.Wallet{}).Where("user_id=?", user.ID).Update("wallet_balance", newBalance)
 	if record1.Error != nil {
@@ -113,7 +104,7 @@ func ReturnOrders(c *gin.Context) {
 			"err": record1.Error.Error(),
 		})
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"msg": "order returned",
 	})
 }
@@ -130,14 +121,14 @@ func CancelOrders(c *gin.Context) {
 	fmt.Println(oderID)
 	database.Db.Raw("select order_status from ordered_items where order_status=?", returns).Scan(&returned)
 	if returned != "" {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Can't cancel products..!! Because order is already returned",
 		})
 		c.Abort()
 		return
 	}
 	if orders.Order_Status == "order cancelled" {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "false",
 			"msg":    "Order already cancelled..!!",
 		})
@@ -150,7 +141,7 @@ func CancelOrders(c *gin.Context) {
 	database.Db.Raw("SELECT wallet_balance FROM wallets WHERE id = ?", user.ID).Scan(&balance)
 	newBalance := price + balance
 	database.Db.Raw("update wallets set wallet_balance=? where id=?", newBalance, user.ID).Scan(&user)
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"msg": "order cancelled",
 	})
 }
