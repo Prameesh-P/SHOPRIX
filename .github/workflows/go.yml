@@ -1,0 +1,30 @@
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+
+      - name: Build
+        run: go build -v .
+
+      - name: GCC
+        run: sudo apt install build-essential -y
+
+      - name: Test
+        run: go test -v
+
+      - name: Restart
+        run: sudo service SHOPRIX restart

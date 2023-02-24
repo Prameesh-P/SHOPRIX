@@ -18,12 +18,11 @@ import (
 
 func Signup(c *gin.Context) {
 	var Body struct {
-		FirstName   string
-		LastName    string
-		Email       string
-		Password    string
-		Phone       string
-		BlockStatus bool
+		FirstName string
+		LastName  string
+		Email     string
+		Password  string
+		Phone     string
 	}
 	if c.ShouldBindJSON(&Body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -40,7 +39,7 @@ func Signup(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	user := models.User{FirstName: Body.FirstName, LastName: Body.LastName, Email: Body.Email, Password: string(hash), Phone: Body.Phone, BlockStatus: Body.BlockStatus}
+	user := models.User{FirstName: Body.FirstName, LastName: Body.LastName, Email: Body.Email, Password: string(hash), Phone: Body.Phone}
 	result := database.Db.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
