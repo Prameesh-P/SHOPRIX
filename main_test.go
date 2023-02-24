@@ -31,18 +31,6 @@ func TestUserHome(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
-//func TestForgetPassword(t *testing.T) {
-//
-//}
-
-type Usesr struct {
-	FirstName string
-	LastName  string
-	Password  string
-	Email     string
-	Phone     string
-}
-
 func TestSignup(t *testing.T) {
 	gin.SetMode(gin.ReleaseMode)
 	r := SetUpRouter()
@@ -60,40 +48,3 @@ func TestSignup(t *testing.T) {
 	r.ServeHTTP(w, reqFound)
 	assert.Equal(t, 200, w.Code)
 }
-
-type User struct {
-	Email    string
-	Password string
-}
-
-//	func TestLogin(t *testing.T) {
-//		var users models.User
-//		r := SetUpRouter()
-//		r.POST("/login", controllers.Login)
-//		user := models.User{
-//			Email:    "prameesh@gmail.com",
-//			Password: "pramee",
-//		}
-//		var count int
-//		database.Db.Raw("select id from users where email=?", user.Email).Scan(&users)
-//		database.Db.Raw("select count(*) from users where email=?", user.Email).Scan(&count)
-//		database.Db.Raw("select * from users where email=?", user.Email)
-//		if users.ID == 0 {
-//			jsonValue, _ := json.Marshal(user)
-//			reqFound, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonValue))
-//			w := httptest.NewRecorder()
-//			r.ServeHTTP(w, reqFound)
-//			assert.Equal(t, 400, w.Code)
-//		}
-//		jsonValue, _ := json.Marshal(user)
-//		reqFound, _ := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonValue))
-//		w := httptest.NewRecorder()
-//		r.ServeHTTP(w, reqFound)
-//		assert.Equal(t, 200, w.Code)
-//	}
-//func TestProductAdding(t *testing.T) {
-//	gin.SetMode(gin.ReleaseMode)
-//	r := SetUpRouter()
-//	r.POST("/admin/addproducts", controllers.ProductAdding)
-//
-//}
