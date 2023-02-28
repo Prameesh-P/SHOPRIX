@@ -27,11 +27,11 @@ PostgreSQL:This project mainly used PostgreSQL as Database with the help of ORM 
 
 ##### clone this project
 
-##### <kbd>git clone https://github.com/nibrasmuhamed/cartique</kbd>
+##### <kbd>git clone https://github.com/Prameesh-P/SHOPRIX</kbd>
 
 ##### open shoprix  Directory
 
-#####<kbd>cd SHOPRIX</kbd>
+##### <kbd>cd SHOPRIX</kbd>
 
 ##### download dependencies
 
