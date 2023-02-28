@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -19,11 +19,11 @@ jobs:
       - name: Build
         run: go build -v .
 
-#      - name: GCC
-#        run: sudo apt install build-essential -y
+      - name: GCC
+        run: sudo apt install build-essential -y
 
       - name: Test
         run: go test -v
 
       - name: Restart
-        run: sudo service SHOPRIX restart
+        run: sudo service shoprix restart
