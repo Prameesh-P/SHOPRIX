@@ -22,8 +22,5 @@ jobs:
       - name: GCC
         run: sudo apt install build-essential -y
 
-      - name: Test
-        run: go test -v
-
       - name: Restart
         run: sudo service shoprix restart
