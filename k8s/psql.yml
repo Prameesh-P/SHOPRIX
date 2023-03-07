@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psql-deployment
+  labels:
+    app: psql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psql
+  template:
+    metadata:
+      labels:
+        app: psql
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:alpine
+          ports:
+            - containerPort: 5432
+      env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: psql-secret
+              key: psql-user
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: psql-secret
+              key: psql-password
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: psql-secret
+              key: psql-db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: psql-service
+spec:
+  selector:
+    app: psql
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
