@@ -1,0 +1,30 @@
+
+version: '3.9'
+
+services:
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB : shoprix
+      POSTGRES_PASSWORD: pramee-12345
+      POSTGRES_USER: postgres
+      PGHOST: localhost
+      PGPORT: 5432
+
+    ports:
+      - 9000:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    depends_on:
+      - database
+    restart: on-failure
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/usr/local/app
+    command:
+      - ./main
