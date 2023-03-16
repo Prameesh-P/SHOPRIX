@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: prameeshp/k8s-app:v1
+          image: prameeshp/shoprix-web:latest
           ports:
             - containerPort: 8000
     env:

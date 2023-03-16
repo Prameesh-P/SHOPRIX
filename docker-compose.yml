@@ -1,30 +1,37 @@
 
-version: '3.9'
+version: '3'
 
 services:
   database:
+    container_name: psql_db
     image: postgres:latest
-    restart: always
+#    restart: always
     environment:
       POSTGRES_DB : shoprix
       POSTGRES_PASSWORD: pramee-12345
       POSTGRES_USER: postgres
-      PGHOST: localhost
-      PGPORT: 5432
+      DATABASE_HOST: psql_db
 
+#    networks:
+#      - api-network
+#      PGPORT: 5432
     ports:
-      - 9000:5432
+      - 5432:5432
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - .././data:/var/lib/postgresql/data
 
   web:
+    container_name: api
     build: .
+#    networks:
+#      - api-network
+    ports:
+      - 8000:8000
+    restart: on-failure
+    environment:
+        - WAIT_HOSTS=database:5432
     depends_on:
       - database
-    restart: on-failure
-    ports:
-      - "8000:8000"
     volumes:
-      - .:/usr/local/app
-    command:
-      - ./main
+      - .././data:/usr/local/app
+    command: sh -c "./main"
