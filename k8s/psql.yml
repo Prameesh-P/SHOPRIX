@@ -14,12 +14,17 @@ spec:
       labels:
         app: psql
     spec:
-      containers:
+     containers:
         - name: postgres
           image: postgres:alpine
+          resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
           ports:
             - containerPort: 5432
-      env:
+          
+     env:
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -31,11 +36,12 @@ spec:
             secretKeyRef:
               name: psql-secret
               key: psql-password
+
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
               name: psql-secret
-              key: psql-db
+              key: psql-db 
 
 ---
 apiVersion: v1

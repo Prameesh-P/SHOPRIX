@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f700d2da-100d-48ec-abd1-0e95bdcf28e4" name="Changes" comment="docker modified and kubernetes secret added">
+      <change beforePath="$PROJECT_DIR$/controllers/imagevalidation.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/imagevalidation.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/psql.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/psql.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
+  <component name="GOROOT" url="file://C:/Program Files/Go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2Kjvzz7Ak6kCgd7366pusDnqYCg" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/GoLang/main-project/SHOPRIX&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;CSS&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\GoLang\main-project\SHOPRIX\controllers" />
+      <recent name="E:\GoLang\main-project\SHOPRIX" />
+      <recent name="E:\GoLang\main-project\SHOPRIX\Service" />
+      <recent name="E:\GoLang\main-project\SHOPRIX\controllers\userControllers_test" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="cart section" />
+    <MESSAGE value="checkout func some updates" />
+    <MESSAGE value="checkout wallet based order completed" />
+    <MESSAGE value="cart controllers cash on delivery finished" />
+    <MESSAGE value="users viewOrders controller added" />
+    <MESSAGE value="users return order  controller started" />
+    <MESSAGE value="users cancel order  controller started" />
+    <MESSAGE value="users can show product id rout added" />
+    <MESSAGE value="userHome unit test is added" />
+    <MESSAGE value="strike payment gateway started" />
+    <MESSAGE value="models some modification" />
+    <MESSAGE value="some lot of changes" />
+    <MESSAGE value="image validation" />
+    <MESSAGE value="image validation properly working" />
+    <MESSAGE value="Logger middleware is added.." />
+    <MESSAGE value="Random email,string and integer generator function created" />
+    <MESSAGE value="Order placing bug fixes" />
+    <MESSAGE value="Image resizer added" />
+    <MESSAGE value="Code refracted" />
+    <MESSAGE value="ci/cd yaml file added for github actions" />
+    <MESSAGE value="Fully dockerized" />
+    <MESSAGE value="k8s added" />
+    <MESSAGE value="docker modified and kubernetes secret added" />
+    <option name="LAST_COMMIT_MESSAGE" value="docker modified and kubernetes secret added" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
