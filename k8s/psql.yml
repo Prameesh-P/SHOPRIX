@@ -13,35 +13,37 @@ spec:
     metadata:
       labels:
         app: psql
-    spec:
+    spec: 
      containers:
         - name: postgres
           image: postgres:alpine
           resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
           ports:
-            - containerPort: 5432
-          
-     env:
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
+          - containerPort: 5432
+          env:
+           - name: POSTGRES_DB
+             valueFrom:
+              secretKeyRef:
+                name: psql-secret
+                key: psql-db 
+           - name: POSTGRES_USER
+             valueFrom:
+             secretKeyRef:
               name: psql-secret
               key: psql-user
 
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
+           - name: POSTGRES_PASSWORD
+             valueFrom:
+             secretKeyRef:
               name: psql-secret
               key: psql-password
+      
+         
 
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: psql-secret
-              key: psql-db 
+
 
 ---
 apiVersion: v1
