@@ -31,15 +31,15 @@ spec:
                 key: psql-db 
            - name: POSTGRES_USER
              valueFrom:
-             secretKeyRef:
-              name: psql-secret
-              key: psql-user
+               secretKeyRef:
+                 name: psql-secret
+                 key: psql-user
 
            - name: POSTGRES_PASSWORD
              valueFrom:
-             secretKeyRef:
-              name: psql-secret
-              key: psql-password
+               secretKeyRef:
+                 name: psql-secret
+                 key: psql-password
       
          
 

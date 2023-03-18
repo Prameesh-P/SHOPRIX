@@ -31,14 +31,14 @@ spec:
                  key: psql-user
             - name: USER_PASSWORD
               valueForm:
-               secretKeyRef:
-               name: psql-secret
-               key: psql-password
+                secretKeyRef:
+                  name: psql-secret
+                  key: psql-password
             - name: DB_URL
               valueFrom:
-              secretKeyRef:
-               name: psql-config
-               key: psql-url
+                secretKeyRef:
+                  name: psql-config
+                  key: psql-url
 
 ---
 apiVersion: v1
