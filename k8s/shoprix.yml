@@ -15,30 +15,31 @@ spec:
         app: webapp
     spec:
       containers:
-        - name: webapp
-          image: prameeshp/shoprix-web:latest
-          resources:
+      - name: webapp
+        image: prameeshp/shoprix-web:latest
+        resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
-          ports:
-            - containerPort: 8000
-          env:
-            - name: USER_NAME
-              valueFrom:
-                secretkeyRef:
-                 name: psql-secret
-                 key: psql-user
-            - name: USER_PASSWORD
-              valueForm:
-                secretKeyRef:
-                  name: psql-secret
-                  key: psql-password
-            - name: DB_URL
-              valueFrom:
-                secretKeyRef:
-                  name: psql-config
-                  key: psql-url
+        ports:
+        - containerPort: 8000
+        env:
+          - name: USER_NAME
+            valueFrom:
+              secretkeyRef:
+                name: psql-secret
+                key: psql-user
+          - name: USER_PASSWORD
+            valueForm:
+              secretKeyRef:
+                name: psql-secret
+                key: psql-password
+          - name: DB_URL
+            valueFrom:
+              configMapKeyRef:
+                name: psql-config
+                key: psql-url
+
 
 ---
 apiVersion: v1
