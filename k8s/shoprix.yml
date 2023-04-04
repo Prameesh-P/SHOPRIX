@@ -5,7 +5,7 @@ metadata:
   labels:
     app: webapp
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: webapp
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: webapp
-        image: prameeshp/shoprix-web:latest
+        image: prameeshp/shoprix:latest
         resources:
           limits:
             memory: "128Mi"
@@ -24,22 +24,21 @@ spec:
         ports:
         - containerPort: 8000
         env:
-          - name: USER_NAME
-            valueFrom:
-              secretkeyRef:
-                name: psql-secret
-                key: psql-user
-          - name: USER_PASSWORD
-            valueForm:
-              secretKeyRef:
-                name: psql-secret
-                key: psql-password
+          - name: dbHost
+            value: psql-db
+          - name: dbPort
+            value: '5432'
+          - name: dbUser
+            value: postgres
+          - name: dbPassword
+            value: pramee-12345
+          - name: dbName
+            value: shoprix
           - name: DB_URL
             valueFrom:
               configMapKeyRef:
                 name: psql-config
                 key: psql-url
-
 
 ---
 apiVersion: v1
@@ -47,11 +46,9 @@ kind: Service
 metadata:
   name: webapp-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
-    app: webapp
+    app: myapp
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
-      NodePort: 31234
+  - port: 8000
+    targetPort: 8000

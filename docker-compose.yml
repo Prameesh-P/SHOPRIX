@@ -3,18 +3,16 @@ version: '3'
 
 services:
   database:
-    container_name: psql_db
+    container_name: psql-db
     image: postgres:latest
 #    restart: always
     environment:
       POSTGRES_DB : shoprix
       POSTGRES_PASSWORD: pramee-12345
       POSTGRES_USER: postgres
-      DATABASE_HOST: psql_db
+      DATABASE_HOST: psql-db
 
-#    networks:
-#      - api-network
-#      PGPORT: 5432
+
     ports:
       - 5432:5432
     volumes:
@@ -23,8 +21,7 @@ services:
   web:
     container_name: api
     build: .
-#    networks:
-#      - api-network
+
     ports:
       - 8000:8000
     restart: on-failure

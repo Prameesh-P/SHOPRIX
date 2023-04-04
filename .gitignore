@@ -1,1 +1,2 @@
 *.env
+microservices/.env

@@ -1,0 +1,51 @@
+syntax ="proto3";
+
+package messages;
+
+option go_package="./messages";
+
+message User{
+    string FirstName =1;
+    string LastName  =2;
+    string Email     =3;
+    string Password  =4;
+    string  phone     =5;
+}
+
+message SignupRequest{
+    string FirstName =1;
+    string LastName  =2;
+    string Email     =3;
+    string Password  =4;
+    string  phone     =5;
+}
+
+message LoginRequest{
+    string Email=1;
+    string Password=2;
+
+}
+
+message SignupRespone{
+    string Name=1;
+    string Email=2;
+    string Result=3;
+}
+
+message LoginResponse{
+    string Name=1;
+    string Email=2;
+    string Result=3;
+}
+
+message HomeRequest{};
+
+message HomeResponse{
+    string Res=1;
+}
+
+service AuthentifiationService{
+    rpc SignUpService(SignupRequest) returns(SignupRespone);
+    rpc LoginService(LoginRequest) returns(LoginResponse);
+    rpc UserHomeService(HomeRequest) returns(HomeResponse);
+}

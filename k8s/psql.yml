@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: psql-deployment
+  name: psql-database
   labels:
     app: psql
 spec:
@@ -40,16 +40,18 @@ spec:
                secretKeyRef:
                  name: psql-secret
                  key: psql-password
-      
-         
-
-
-
+           - name: POSTGRES_HOST
+             value: psql-db
+           - name: POSTGRES_DATABASE
+             valueFrom:
+               secretKeyRef:
+                 name: psql-secret
+                 key: psql-db      
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: psql-service
+  name: psql-db
 spec:
   selector:
     app: psql

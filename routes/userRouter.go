@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/Prameesh-P/SHOPRIX/Service"
+	"github.com/Prameesh-P/SHOPRIX/client"
 	c "github.com/Prameesh-P/SHOPRIX/controllers"
 	"github.com/Prameesh-P/SHOPRIX/middlewares"
 	"github.com/gin-gonic/gin"
@@ -9,8 +10,12 @@ import (
 
 func UserRoutes(routes *gin.Engine) {
 	user := routes.Group("/user")
+	
+	
+	/*------------------------Group Routes >> user--------------------------- */
+
+
 	{
-		user.GET("/", c.UserHome)
 		user.GET("/profile", middlewares.UserAuth(), c.UserProfileGet)
 		user.POST("/profile/edit", middlewares.UserAuth(), c.EditUserAddress)
 		user.POST("/profile/add", middlewares.UserAuth(), c.AddAddress)
@@ -26,8 +31,12 @@ func UserRoutes(routes *gin.Engine) {
 		user.GET("/returnorder", middlewares.UserAuth(), c.ReturnOrders)
 		user.GET("/cancelorder", middlewares.UserAuth(), c.CancelOrders)
 	}
-	routes.POST("/signup", c.Signup)
-	routes.POST("/login", c.Login)
+
+
+	/*---------------------------without Groups---------------------------------*/
+
+
+
 	routes.GET("/forgetpassword", middlewares.UserAuth(), c.ForgetPassword)
 	routes.GET("/validate", middlewares.UserAuth(), c.Validate)
 	routes.POST("/login/otp", c.OtpLog)
@@ -35,4 +44,16 @@ func UserRoutes(routes *gin.Engine) {
 	routes.GET("/logout", middlewares.AdminAuth())
 	routes.GET("/forgetemail/:email", middlewares.UserAuth(), c.ForgetPasswordEmail)
 	routes.GET("/app", Service.Tes)
+
+	
+	
+	/*---------------------MicorService Routes----------------------*/
+
+
+		    routes.GET("/",client.UserHome)
+	 	    routes.POST("/signup", client.Signup)
+		    routes.POST("/login", client.Login)
+
+	
+
 }

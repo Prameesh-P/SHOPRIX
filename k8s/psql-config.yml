@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: psql-config
 data:
-  psql-url: psql-service
+  psql-url: psql-db

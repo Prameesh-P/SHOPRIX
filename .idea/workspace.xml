@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f700d2da-100d-48ec-abd1-0e95bdcf28e4" name="Changes" comment="docker modified and kubernetes secret added">
-      <change beforePath="$PROJECT_DIR$/controllers/imagevalidation.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/imagevalidation.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/psql-config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/psql-config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/psql-secret.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/psql-secret.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/k8s/psql.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/psql.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/shoprix.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/shoprix.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
