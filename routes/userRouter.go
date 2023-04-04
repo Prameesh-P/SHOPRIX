@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/Prameesh-P/SHOPRIX/Service"
-	"github.com/Prameesh-P/SHOPRIX/client"
 	c "github.com/Prameesh-P/SHOPRIX/controllers"
 	"github.com/Prameesh-P/SHOPRIX/middlewares"
 	"github.com/gin-gonic/gin"
@@ -49,11 +48,5 @@ func UserRoutes(routes *gin.Engine) {
 	
 	/*---------------------MicorService Routes----------------------*/
 
-
-		    routes.GET("/",client.UserHome)
-	 	    routes.POST("/signup", client.Signup)
-		    routes.POST("/login", client.Login)
-
-	
 
 }
