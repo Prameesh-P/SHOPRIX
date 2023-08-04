@@ -10,6 +10,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
+// @Summary admin-coupen
+// @ID admin-userdata-coupen
+// @Description admin userdata
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param coupen_code formData string true "coupen code"
+// @Param discount formData string true "discount of the coupen"
+// @Param quantity formData string true "quantity code"
+// @Param validity formData string true "validity code"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/generate-coupens/ [post]
 func GenerateCoupens(c *gin.Context) {
 	coupenCode := c.PostForm("coupen_code")
 	coupenDiscount := c.PostForm("discount")

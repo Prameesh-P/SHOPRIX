@@ -8,17 +8,29 @@ import (
 	"net/http"
 	"strconv"
 )
+type Productdetails struct {
+	ProductID uint
+	Quantity  uint
+}
 
+
+// Add to cart
+// @Summary Add product into user cart
+// @ID add-to-cart
+// @Description add products
+// @Tags User Cart
+// @Produce json
+// @Param user formData string true "email of the user"
+// @Param user_details body  Productdetails true "User details"
+// @Success 200 
+// @Failure 400 
+// @Router /user/addtocart [post]
 func AddToCart(c *gin.Context) {
 	var user models.User
 	var product models.Product
 	userEmail := c.Request.FormValue("user")
-	fmt.Printf("huuu%s", userEmail)
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
-	var ProductDetails struct {
-		ProductID uint
-		Quantity  uint
-	}
+	var ProductDetails Productdetails
 	c.ShouldBindJSON(&ProductDetails)
 	database.Db.Raw("select price,stock from products where product_id=?", ProductDetails.ProductID).Scan(&product)
 	total := product.Price * ProductDetails.Quantity
@@ -80,6 +92,18 @@ type CartsInfo []struct {
 	TotalPrice  string
 }
 
+
+// @Summary view cart
+// @ID view-cart
+// @Description add products
+// @Tags User Cart
+// @Produce json
+// @Param user formData string true "email of the user"
+// @Param productid formData string true "product of the user"
+// @Param quantity formData string true "product of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/viewcart [get]
 func ViewCart(c *gin.Context) {
 	var cartss CartsInfo
 	var products models.Product
@@ -131,6 +155,24 @@ func ViewCart(c *gin.Context) {
 		"total": totalcartvalue,
 	})
 }
+
+
+// @Summary Checkout address
+// @ID checkout address
+// @Description address for checkout
+// @Tags User Cart
+// @Produce json
+// @Param user formData string true "email of the user"
+// @Param name formData string true "name of the user"
+// @Param phone_number formData string true "phone number of the user"
+// @Param pincode formData string true "pincode of the user"
+// @Param area formData string true "area of the user"
+// @Param house formData string true "house of the user"
+// @Param landmark formData string true "landmark of the user"
+// @Param city formData string true "city of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/checkoutAddress [post]
 func CheckOutAddress(c *gin.Context) {
 	useremail := c.PostForm("user")
 	var user models.User
@@ -179,13 +221,24 @@ var Address []struct {
 	Landmark     string
 	City         string
 }
-var Flag = 0
 
+// @Summary Checkout 
+// @ID checkout 
+// @Description checkout
+// @Tags User Cart
+// @Produce json
+// @Param user query string true "Email address of the user"
+// @Param wallet query string false "wallet of the user"
+// @Param addressID formData string true "address id of the user"
+// @Param PaymentMethod formData string true "payment method  of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/checkout [get]
 func CheckOut(c *gin.Context) {
-
+	var Flag = 0
 	var user models.User
 	var carts CartsInfo
-	userEmail := c.PostForm("user")
+	userEmail := c.Param("user")
 	wallet := c.Query("wallet")
 	database.Db.Raw("select id from users where email=?", userEmail).Scan(&user)
 	precord := database.Db.Raw("select  products.product_id, products.product_name,products.price,carts.user_id,users.email ,carts.quantity,total_price from carts join products on products.product_id=carts.product_id join users on carts.user_id=users.id where users.email=? ", userEmail).Scan(&carts)
@@ -246,6 +299,60 @@ func CheckOut(c *gin.Context) {
 		})
 		Flag++
 		return
+	}else if PaymentMethod=="online"{
+		for _, v := range carts {
+			pud := v.UserId
+			puid, _ := strconv.Atoi(pud)
+			fmt.Println(puid)
+			pid := v.ProductId
+			proID, _ := strconv.Atoi(pid)
+			pname := v.ProductName
+			fmt.Println(pname)
+			pprice := v.Price
+			Pprice, _ := strconv.Atoi(pprice)
+			pQuantity := v.Quantity
+			PQuantity, _ := strconv.Atoi(pQuantity)
+			fmt.Println(CreateOrderId())
+			//appliedCoupen := CoupenDisc.Coupen_code
+			totalAmount := uint(PQuantity) * uint(Pprice)
+			//discount := (totalAmount * CoupenDisc.Discount) / 100
+			TotalAmount := totalAmount
+			orderedItems := models.OrderedItems{UserId: uint(puid), Product_id: uint(proID),
+				Product_Name: pname, Price: pprice, OrdersID: CreateOrderId(),
+				Order_Status: "confirmed", PaymentMethod: PaymentMethod, Payment_Status: "pending", Total_amount: TotalAmount}
+			database.Db.Create(&orderedItems)
+		}
+		c.Redirect(http.StatusFound,"/user/razorpay")
+		// if ok :=RazorPay(c);!ok{
+		// 	c.JSON(http.StatusBadRequest, gin.H{
+		// 		"msg": "please complete payment",
+		// 	})
+		// }else {
+			if Flag > 0 {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"msg": "item already placed",
+				})
+				return
+			}
+			var orderstas string
+			database.Db.Raw("select order_status from ordered_items where order_status=?", "confirmed").Scan(&orderstas)
+			if orderstas == "order cancelled" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "Already cancelled item",
+				})
+			} else if orderstas == "returned" {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "Already returned item",
+				})
+			}
+			c.JSON(http.StatusOK, gin.H{
+				"msg": "Cash on delivery placed..!!",
+			})
+			
+			Flag++
+			return
+		// }
+		
 	}
 
 	record := database.Db.Raw("select address_id, user_id,name,phone_num,pincode,house,area,land_mark,city from addresses where user_id=?", user.ID).Scan(&Address)
@@ -274,7 +381,7 @@ func CheckOut(c *gin.Context) {
 			})
 			c.Abort()
 			return
-		} else if wallets.WalletBalance > totalCartValue {
+		} else {
 			wallets.WalletBalance = wallets.WalletBalance - totalCartValue
 			database.Db.Model(&wallets).Where("user_id=?", user.ID).Update("wallet-balance", wallets.WalletBalance)
 			walletOrder := models.Orders{

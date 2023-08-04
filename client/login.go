@@ -62,7 +62,7 @@ func Login(c *gin.Context) {
 	cc, err := grpc.Dial("localhost"+port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"Err": "Error whiler dailing",
+			"Err": "Error while dailing",
 		})
 		return
 	}

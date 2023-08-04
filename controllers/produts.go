@@ -24,7 +24,18 @@ var Products []struct {
 	Category    string
 	Size        uint
 }
-
+//show product list
+// @Summary Admin productlist viewer
+// @ID admin-productlist-view
+// @Description admin can view productlist 
+// @Tags Admin Product
+// @Produce json
+// @Param brandsearch query string true "brand of the  product"
+// @Param categorysearch query string true "catogery of the  product"
+// @Param sizesearch query string true "size of the  product"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/getcategory [get]
 func ListAllCategory(c *gin.Context) {
 	var brandss models.Brand
 	var categorys models.Category
@@ -67,11 +78,23 @@ func ListAllCategory(c *gin.Context) {
 		"available sizes":      shoesizes,
 	})
 }
+type Brand struct {
+	Brand_id uint `json:"brand_id"`
+	Discount uint `json:"discount"`
+}
+
+//show product discount
+// @Summary Admin product discount
+// @ID admin-product-discount
+// @Description admin can discount product 
+// @Tags Admin Product
+// @Produce json
+// @Param Brand body  Brand true "brand discount"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/applydiscount [put]
 func ApplyDiscount(c *gin.Context) {
-	var brand struct {
-		Brand_id uint `json:"brand_id"`
-		Discount uint `json:"discount"`
-	}
+	var brand Brand
 	if err := c.ShouldBindJSON(&brand); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -86,8 +109,28 @@ func ApplyDiscount(c *gin.Context) {
 	}
 }
 
-func ProductAdding(c *gin.Context) {
 
+//show product list
+// @Summary Admin productadd 
+// @ID admin-product add
+// @Description admin can add product
+// @Tags Admin Product
+// @Produce json
+// @Param productname formData string true "name of the  product"
+// @Param price formData string true "price of the  product"
+// @Param description formData string true "discription of the  product"
+// @Param color formData string true "color of the  product"
+// @Param brandID formData string true "brandID of the  product"
+// @Param stock formData string true "stock of the  product"
+// @Param catogoryID formData string true "cotogeryID of the  product"
+// @Param sizeID formData string true "sizeID of the  product"
+// @Param image formData file false "Upload a product image"
+// @Param discount formData string true "discount of the  product"
+// @Param BrandDiscount formData string true "brandDiscount of the  product"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/addproducts [post]
+func ProductAdding(c *gin.Context) {
 	prodname := c.Request.FormValue("productname")
 	price := c.Request.FormValue("price")
 	Price, _ := strconv.Atoi(price)
@@ -104,76 +147,6 @@ func ProductAdding(c *gin.Context) {
 	// images adding
 	imagepath, _ := c.FormFile("image")
 	extension := filepath.Ext(imagepath.Filename)
-	//switch extension {
-	//
-	//case ".jpg":
-	//
-	//	c.JSON(200, gin.H{
-	//		"status":  "true",
-	//		"message": "You are selected jpg file",
-	//	})
-	//
-	//case ".gif":
-	//
-	//	c.JSON(200, gin.H{
-	//		"status":  "true",
-	//		"message": "You are selected gif file",
-	//	})
-	//
-	//case ".png":
-	//
-	//	c.JSON(200, gin.H{
-	//		"status":  "true",
-	//		"message": "You are selected png file",
-	//	})
-	//
-	//case ".jpeg":
-	//
-	//	c.JSON(200, gin.H{
-	//		"status":  "true",
-	//		"message": "You are selected jpg file",
-	//	})
-	//
-	//case ".pdf":
-	//
-	//	c.JSON(400, gin.H{
-	//		"error": "you are selected file is pdf..!!! Please choose valid image file",
-	//	})
-	//	c.Abort()
-	//	return
-	//
-	//case ".mp4":
-	//
-	//	c.JSON(400, gin.H{
-	//		"error": "you are selected file is video..!!! Please choose valid image file",
-	//	})
-	//	c.Abort()
-	//	return
-	//
-	//case ".mp3":
-	//
-	//	c.JSON(400, gin.H{
-	//		"error": "you are selected file is audio..!!! Please choose valid image file",
-	//	})
-	//	c.Abort()
-	//	return
-	//
-	//case ".mkv":
-	//
-	//	c.JSON(400, gin.H{
-	//		"error": "you are selected file is mkv..!!! Please choose valid image file",
-	//	})
-	//	c.Abort()
-	//	return
-	//
-	//default:
-	//	c.JSON(400, gin.H{
-	//		"error": "You are selected file type is unknown..Please select valid image file..!!!!!",
-	//	})
-	//	c.Abort()
-	//	return
-	//}
-
 	fmt.Printf("jgsdigj %s", extension)
 	image := uuid.New().String() + extension
 	c.SaveUploadedFile(imagepath, "./public/images"+image)
@@ -241,6 +214,16 @@ type EditProductsData struct {
 	Color       string `json:"color"`
 }
 
+// @Summary Admin product edit
+// @ID admin-product edit
+// @Description admin can edit product
+// @Tags Admin Product
+// @Produce json
+// @Param id query string true "id of the  product"
+// @Param EditProductData body  EditProductsData true "edit product data"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/editproducts [put]
 func EditProducts(c *gin.Context) { //admin
 	params := c.Param("id")
 	var editProducts EditProductsData
@@ -260,6 +243,16 @@ func EditProducts(c *gin.Context) { //admin
 	c.JSON(http.StatusOK, gin.H{"msg": "updated_successfully"})
 
 }
+
+// @Summary Admin product delete
+// @ID admin-product delete
+// @Description admin can delete product
+// @Tags Admin Product
+// @Produce json
+// @Param id query string true "id of the  product"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/deleteproducts/ [delete]
 func DeleteProductById(c *gin.Context) { //admin
 	params := c.Param("id")
 	var products models.Product
@@ -282,6 +275,18 @@ func DeleteProductById(c *gin.Context) { //admin
 
 	c.JSON(http.StatusOK, gin.H{"msg": "deleted successfully"})
 }
+
+
+//show product 
+// @Summary User productid viewer
+// @ID user-productid-view
+// @Description user can view productid with with name
+// @Tags Users Product
+// @Produce json
+// @Param product-name formData string true "name of the  product"
+// @Success 200 
+// @Failure 400 
+// @Router /user/show-product-id [get]
 func ShowProductsID(c *gin.Context) {
 	var product models.Product
 	params := c.PostForm("product-name")
@@ -298,6 +303,17 @@ func ShowProductsID(c *gin.Context) {
 		"Product id": product.ProductId,
 	})
 }
+
+//show product 
+// @Summary User product viewer
+// @ID user-product-view with id
+// @Description user can view product with with id
+// @Tags Users Product
+// @Produce json
+// @Param id formData string true "id of the  product"
+// @Success 200 
+// @Failure 400 
+// @Router /user/get-productbyid [get]
 func GetProductByID(c *gin.Context) { //user
 	params := c.Request.FormValue("id")
 	fmt.Println(params)
@@ -311,6 +327,17 @@ func GetProductByID(c *gin.Context) { //user
 	c.JSON(http.StatusOK, gin.H{"product": Products})
 }
 
+//show product 
+// @Summary User product viewer with search
+// @ID user-product-view with search
+// @Description user can view product with with id
+// @Tags Users Product
+// @Produce json
+// @Param search formData string true "searched data of the  product"
+// @Param sort formData string true "sort products"
+// @Success 200 
+// @Failure 400 
+// @Router /user/view-products [get]
 func ProductView(c *gin.Context) {
 	record := database.Db.Raw("SELECT product_id,product_name,actual_price,price,image,color,description,stock,brands.brands,categories.category,shoe_sizes.size FROM products join brands on products.brand_id = brands.id join categories on products.category_id=categories.id join shoe_sizes on products.shoe_size_id=shoe_sizes.id").Scan(&Products)
 	fmt.Println(record)

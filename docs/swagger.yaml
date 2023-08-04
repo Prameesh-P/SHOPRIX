@@ -1,0 +1,928 @@
+basePath: /
+definitions:
+  controllers.Admin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  controllers.Body:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  controllers.Brand:
+    properties:
+      brand_id:
+        type: integer
+      discount:
+        type: integer
+    type: object
+  controllers.EditProductsData:
+    properties:
+      brand:
+        type: string
+      color:
+        type: string
+      price:
+        type: integer
+      productName:
+        type: string
+    type: object
+  controllers.Productdetails:
+    properties:
+      productID:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      block_Status:
+        type: boolean
+      city:
+        type: string
+      country:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      id:
+        type: integer
+      landmark:
+        type: string
+      last_name:
+        maxLength: 100
+        minLength: 2
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      pincode:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - phone
+    type: object
+host: localhost:9000
+info:
+  contact: {}
+  description: This is a Complete Ecormmerce server.
+  termsOfService: http://swagger.io/terms/
+  title: Gin Swagger Example API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: User Home Page
+      responses:
+        "200":
+          description: OK
+      summary: HomePage
+      tags:
+      - Users
+  /admin/:
+    get:
+      consumes:
+      - application/json
+      description: admin home
+      operationId: admin-home
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: adminhome
+      tags:
+      - Admin
+  /admin/addproducts:
+    post:
+      description: admin can add product
+      operationId: admin-product add
+      parameters:
+      - description: name of the  product
+        in: formData
+        name: productname
+        required: true
+        type: string
+      - description: price of the  product
+        in: formData
+        name: price
+        required: true
+        type: string
+      - description: discription of the  product
+        in: formData
+        name: description
+        required: true
+        type: string
+      - description: color of the  product
+        in: formData
+        name: color
+        required: true
+        type: string
+      - description: brandID of the  product
+        in: formData
+        name: brandID
+        required: true
+        type: string
+      - description: stock of the  product
+        in: formData
+        name: stock
+        required: true
+        type: string
+      - description: cotogeryID of the  product
+        in: formData
+        name: catogoryID
+        required: true
+        type: string
+      - description: sizeID of the  product
+        in: formData
+        name: sizeID
+        required: true
+        type: string
+      - description: Upload a product image
+        in: formData
+        name: image
+        type: file
+      - description: discount of the  product
+        in: formData
+        name: discount
+        required: true
+        type: string
+      - description: brandDiscount of the  product
+        in: formData
+        name: BrandDiscount
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Admin productadd
+      tags:
+      - Admin Product
+  /admin/applydiscount:
+    put:
+      description: admin can discount product
+      operationId: admin-product-discount
+      parameters:
+      - description: brand discount
+        in: body
+        name: Brand
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Brand'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Admin product discount
+      tags:
+      - Admin Product
+  /admin/deleteproducts/:
+    delete:
+      description: admin can delete product
+      operationId: admin-product delete
+      parameters:
+      - description: id of the  product
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Admin product delete
+      tags:
+      - Admin Product
+  /admin/editproducts:
+    put:
+      description: admin can edit product
+      operationId: admin-product edit
+      parameters:
+      - description: id of the  product
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: edit product data
+        in: body
+        name: EditProductData
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.EditProductsData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Admin product edit
+      tags:
+      - Admin Product
+  /admin/generate-coupens/:
+    post:
+      consumes:
+      - application/json
+      description: admin userdata
+      operationId: admin-userdata-coupen
+      parameters:
+      - description: coupen code
+        in: formData
+        name: coupen_code
+        required: true
+        type: string
+      - description: discount of the coupen
+        in: formData
+        name: discount
+        required: true
+        type: string
+      - description: quantity code
+        in: formData
+        name: quantity
+        required: true
+        type: string
+      - description: validity code
+        in: formData
+        name: validity
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: admin-coupen
+      tags:
+      - Admin
+  /admin/getcategory:
+    get:
+      description: admin can view productlist
+      operationId: admin-productlist-view
+      parameters:
+      - description: brand of the  product
+        in: query
+        name: brandsearch
+        required: true
+        type: string
+      - description: catogery of the  product
+        in: query
+        name: categorysearch
+        required: true
+        type: string
+      - description: size of the  product
+        in: query
+        name: sizesearch
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Admin productlist viewer
+      tags:
+      - Admin Product
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: admin login
+      operationId: admin-login
+      parameters:
+      - description: admin details
+        in: body
+        name: admin_details
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: adminLogin
+      tags:
+      - Admin
+  /admin/signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin with the specified details.
+      operationId: admin-signup
+      parameters:
+      - description: User details
+        in: body
+        name: user_details
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: adminSignUp
+      tags:
+      - Admin
+  /admin/userdata/:
+    get:
+      consumes:
+      - application/json
+      description: admin userdata
+      operationId: admin-userdata
+      parameters:
+      - description: user name
+        in: query
+        name: search
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: admin-userdata
+      tags:
+      - Admin User Handler
+  /admin/userdata/block/:
+    put:
+      consumes:
+      - application/json
+      description: admin user block
+      operationId: admin-userblock
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: admin-userblock
+      tags:
+      - Admin User Handler
+  /admin/userdata/unblock/:
+    put:
+      consumes:
+      - application/json
+      description: admin user unblock
+      operationId: admin-userunblock
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: admin-userunblock
+      tags:
+      - Admin User Handler
+  /forgetemail/:email:
+    get:
+      description: user can forgot password
+      operationId: user-forgot-password
+      parameters:
+      - description: Email address of the user
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User Forget Password
+      tags:
+      - Users
+  /forgetpassword:
+    get:
+      description: user can forgot password with otp
+      operationId: user-forgot-password-otp
+      parameters:
+      - description: email of the user
+        in: formData
+        name: useremail
+        required: true
+        type: string
+      - description: otp of the user
+        in: formData
+        name: otp
+        required: true
+        type: string
+      - description: new Passsword of the user
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User Forget Password with otp
+      tags:
+      - Users
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login as a user to access the ecommerce site
+      operationId: user-login-email
+      parameters:
+      - description: User details
+        in: body
+        name: user_details
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Body'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User Login
+      tags:
+      - Users
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the specified details.
+      operationId: user-signup
+      parameters:
+      - description: User details
+        in: body
+        name: user_details
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: UserSignUp
+      tags:
+      - Users
+  /user/addtocart:
+    post:
+      description: add products
+      operationId: add-to-cart
+      parameters:
+      - description: email of the user
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: User details
+        in: body
+        name: user_details
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.Productdetails'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Add product into user cart
+      tags:
+      - User Cart
+  /user/cancelorder:
+    get:
+      description: cancel order
+      operationId: cancel orders
+      parameters:
+      - description: Email address of the user
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: 'order id of the product '
+        in: query
+        name: orderid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: calcel order
+      tags:
+      - User Orders
+  /user/checkout:
+    get:
+      description: checkout
+      operationId: checkout
+      parameters:
+      - description: Email address of the user
+        in: query
+        name: user
+        required: true
+        type: string
+      - description: wallet of the user
+        in: query
+        name: wallet
+        type: string
+      - description: address id of the user
+        in: formData
+        name: addressID
+        required: true
+        type: string
+      - description: payment method  of the user
+        in: formData
+        name: PaymentMethod
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Checkout
+      tags:
+      - User Cart
+  /user/checkoutAddress:
+    post:
+      description: address for checkout
+      operationId: checkout address
+      parameters:
+      - description: email of the user
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: name of the user
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: phone number of the user
+        in: formData
+        name: phone_number
+        required: true
+        type: string
+      - description: pincode of the user
+        in: formData
+        name: pincode
+        required: true
+        type: string
+      - description: area of the user
+        in: formData
+        name: area
+        required: true
+        type: string
+      - description: house of the user
+        in: formData
+        name: house
+        required: true
+        type: string
+      - description: landmark of the user
+        in: formData
+        name: landmark
+        required: true
+        type: string
+      - description: city of the user
+        in: formData
+        name: city
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Checkout address
+      tags:
+      - User Cart
+  /user/get-productbyid:
+    get:
+      description: user can view product with with id
+      operationId: user-product-view with id
+      parameters:
+      - description: id of the  product
+        in: formData
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User product viewer
+      tags:
+      - Users Product
+  /user/profile:
+    get:
+      description: user profile viewer
+      operationId: user profile get
+      parameters:
+      - description: email of the user
+        in: formData
+        name: user
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: user details willget
+      tags:
+      - Users Profile
+  /user/profile/add:
+    post:
+      description: user profile add
+      operationId: user profile add
+      parameters:
+      - description: email of the user
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: name of the user
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: phone number of the user
+        in: formData
+        name: phonenumber
+        required: true
+        type: string
+      - description: pincode of the user
+        in: formData
+        name: pincode
+        required: true
+        type: string
+      - description: area of the user
+        in: formData
+        name: area
+        required: true
+        type: string
+      - description: house of the user
+        in: formData
+        name: house
+        required: true
+        type: string
+      - description: landmark of the user
+        in: formData
+        name: landmark
+        required: true
+        type: string
+      - description: city of the user
+        in: formData
+        name: city
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: user details add
+      tags:
+      - Users Profile
+  /user/profile/edit:
+    put:
+      description: user profile editor
+      operationId: user profile edit
+      parameters:
+      - description: name of the user
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: phone number of the user
+        in: formData
+        name: phonenumber
+        required: true
+        type: string
+      - description: pincode of the user
+        in: formData
+        name: pincode
+        required: true
+        type: string
+      - description: area of the user
+        in: formData
+        name: area
+        required: true
+        type: string
+      - description: house of the user
+        in: formData
+        name: house
+        required: true
+        type: string
+      - description: landmark of the user
+        in: formData
+        name: landmark
+        required: true
+        type: string
+      - description: city of the user
+        in: formData
+        name: city
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: user details edit
+      tags:
+      - Users Profile
+  /user/returnorder:
+    get:
+      description: return order
+      operationId: return orders
+      parameters:
+      - description: Email address of the user
+        in: query
+        name: user
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: return order
+      tags:
+      - User Orders
+  /user/show-product-id:
+    get:
+      description: user can view productid with with name
+      operationId: user-productid-view
+      parameters:
+      - description: name of the  product
+        in: formData
+        name: product-name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User productid viewer
+      tags:
+      - Users Product
+  /user/view-products:
+    get:
+      description: user can view product with with id
+      operationId: user-product-view with search
+      parameters:
+      - description: searched data of the  product
+        in: formData
+        name: search
+        required: true
+        type: string
+      - description: sort products
+        in: formData
+        name: sort
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: User product viewer with search
+      tags:
+      - Users Product
+  /user/viewcart:
+    get:
+      description: add products
+      operationId: view-cart
+      parameters:
+      - description: email of the user
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: product of the user
+        in: formData
+        name: productid
+        required: true
+        type: string
+      - description: product of the user
+        in: formData
+        name: quantity
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: view cart
+      tags:
+      - User Cart
+  /user/vieworder:
+    get:
+      description: view orders
+      operationId: viewOrders
+      parameters:
+      - description: Email address of the user
+        in: formData
+        name: user
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: viewOrders
+      tags:
+      - User Orders
+schemes:
+- http
+swagger: "2.0"

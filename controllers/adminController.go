@@ -1,35 +1,45 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/Prameesh-P/SHOPRIX/authentification"
 	i "github.com/Prameesh-P/SHOPRIX/database"
 	"github.com/Prameesh-P/SHOPRIX/models"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
+type Admin struct {
+	Email    string
+	Password string
+}
 
+
+// @Summary adminSignUp
+// @ID admin-signup
+// @Description Create a new admin with the specified details.
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param user_details body  Admin true "User details"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/signup [post]
 func AdminSignup(c *gin.Context) {
 	var admin models.Admin
-	var count uint
-	var Admin struct {
-		Email    string
-		Password string
-	}
-	if err := c.ShouldBind(&Admin); err != nil {
+	if err := c.ShouldBind(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
 	}
-	i.Db.Raw("SELECT count(*) FROM admins WHERE email=?", admin.Email).Scan(&count)
-	if count > 0 {
+	i.Db.First(&admin, "email=?", admin.Email)
+	if admin.ID != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"err": "false",
-			"msg": "Admin with same Email already exists",
+			"error": "This email already registered..",
 		})
-		c.Abort()
 		return
 	}
-	bytes, err := admin.HashPassword(Admin.Password)
+	bytes, err := admin.HashPassword(admin.Password)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, gin.H{
 			"error": "failed to hash",
@@ -37,7 +47,7 @@ func AdminSignup(c *gin.Context) {
 		return
 	}
 
-	admins := models.Admin{Email: Admin.Email, Password: bytes}
+	admins := models.Admin{Email: admin.Email, Password: bytes}
 	record := i.Db.Create(&admins)
 	if record.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -48,11 +58,18 @@ func AdminSignup(c *gin.Context) {
 		"status": "OK",
 	})
 }
+// @Summary adminLogin
+// @ID admin-login
+// @Description admin login
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param admin_details body Admin true "admin details"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/login [post]
 func AdminLogin(c *gin.Context) {
-	var admin struct {
-		Email    string
-		Password string
-	}
+	var admin Admin
 	if err := c.ShouldBind(&admin); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
@@ -92,11 +109,23 @@ func AdminLogin(c *gin.Context) {
 	})
 }
 
+// @Summary adminhome
+// @ID admin-home
+// @Description admin home
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Success 200 
+// @Failure 400 
+// @Router /admin/ [get]
 func AdminHome(c *gin.Context) {
+	
+	
 	c.JSON(http.StatusAccepted, gin.H{
 		"status": "Welcome to admin home page ",
 	})
 }
+
 func LogoutUser(c *gin.Context) {
 
 	token := c.GetHeader("access_token")
@@ -119,19 +148,53 @@ type UserDataStruct struct {
 	Phone     string
 }
 
+// @Summary admin-userdata
+// @ID admin-userdata
+// @Description admin userdata
+// @Tags Admin User Handler
+// @Accept json
+// @Produce json
+// @Param search query string true "user name"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/userdata/ [get]
 func UserData(c *gin.Context) {
 	var user UserDataStruct
-	if search := c.Query("search"); search != "" {
+	search := c.Param("search"); 
+	if  search != "" {
 		i.Db.Raw("SELECT id,first_name,last_name,email,phone FROM users where first_name like ? ORDER BY id ASC ", search).Scan(&user)
 	}
+	fmt.Println(search)
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
+
+// @Summary admin-userblock
+// @ID admin-userblock
+// @Description admin user block
+// @Tags Admin User Handler
+// @Accept json
+// @Produce json
+// @Param id query string true "user id"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/userdata/block/ [put]
 func BlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User
 	i.Db.Raw("UPDATE users SET block_status=true where id=?", params).Scan(&user)
 	c.JSON(http.StatusOK, gin.H{"msg": "Blocked successfully"})
 }
+
+// @Summary admin-userunblock
+// @ID admin-userunblock
+// @Description admin user unblock
+// @Tags Admin User Handler
+// @Accept json
+// @Produce json
+// @Param id query string true "user id"
+// @Success 200 
+// @Failure 400 
+// @Router /admin/userdata/unblock/ [put]
 func UnBlockUser(c *gin.Context) {
 	params := c.Param("id")
 	var user models.User

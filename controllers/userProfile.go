@@ -19,6 +19,17 @@ type Profile struct {
 	Email    string
 }
 
+
+// User profile get
+// @Summary user details willget 
+// @ID user profile get
+// @Description user profile viewer
+// @Tags Users Profile
+// @Produce json
+//@Param user formData string true "email of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/profile [get]
 func UserProfileGet(c *gin.Context) {
 	userEmail := c.Request.FormValue("user")
 	var profile Profile
@@ -27,6 +38,23 @@ func UserProfileGet(c *gin.Context) {
 		"profile": profile,
 	})
 }
+
+// User profile get
+// @Summary user details edit 
+// @ID user profile edit
+// @Description user profile editor
+// @Tags Users Profile
+// @Produce json
+// @Param name formData string true "name of the user"
+// @Param phonenumber formData string true "phone number of the user"
+// @Param pincode formData string true "pincode of the user"
+// @Param area formData string true "area of the user"
+// @Param house formData string true "house of the user"
+// @Param landmark formData string true "landmark of the user"
+// @Param city formData string true "city of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/profile/edit [put]
 func EditUserAddress(c *gin.Context) {
 	var user models.User
 	Name := c.Request.FormValue("name")
@@ -50,6 +78,24 @@ func EditUserAddress(c *gin.Context) {
 		"success": "update successfully",
 	})
 }
+
+// User profile add
+// @Summary user details add 
+// @ID user profile add
+// @Description user profile add
+// @Tags Users Profile
+// @Produce json
+// @Param email formData string true "email of the user"
+// @Param name formData string true "name of the user"
+// @Param phonenumber formData string true "phone number of the user"
+// @Param pincode formData string true "pincode of the user"
+// @Param area formData string true "area of the user"
+// @Param house formData string true "house of the user"
+// @Param landmark formData string true "landmark of the user"
+// @Param city formData string true "city of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/profile/add [post]
 func AddAddress(c *gin.Context) {
 	var user models.User
 	userEmail := c.PostForm("email")

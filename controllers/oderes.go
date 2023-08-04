@@ -32,6 +32,18 @@ func CreateOrderId() string {
 	orderID := "OID" + id
 	return orderID
 }
+
+
+
+// @Summary viewOrders 
+// @ID viewOrders
+// @Description view orders
+// @Tags User Orders
+// @Produce json
+// @Param user formData string true "Email address of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/vieworder [get]
 func ViewOrders(c *gin.Context) {
 	var user models.User
 	var ordered_items Orderd_Items
@@ -59,6 +71,16 @@ func ViewOrders(c *gin.Context) {
 		"orders": ordered_items,
 	})
 }
+
+// @Summary return order
+// @ID return orders 
+// @Description return order
+// @Tags User Orders
+// @Produce json
+// @Param user query string true "Email address of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /user/returnorder [get]
 func ReturnOrders(c *gin.Context) {
 	var order models.OrderedItems
 	var user models.User
@@ -108,6 +130,18 @@ func ReturnOrders(c *gin.Context) {
 		"msg": "order returned",
 	})
 }
+
+
+// @Summary calcel order
+// @ID cancel orders 
+// @Description cancel order
+// @Tags User Orders
+// @Produce json
+// @Param user query string true "Email address of the user"
+// @Param orderid query string true "order id of the product "
+// @Success 200 
+// @Failure 400 
+// @Router /user/cancelorder [get]
 func CancelOrders(c *gin.Context) {
 	var user models.User
 	var returned string

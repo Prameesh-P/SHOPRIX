@@ -16,6 +16,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// @Summary UserSignUp
+// @ID user-signup
+// @Description Create a new user with the specified details.
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user_details body  models.User true "User details"
+// @Success 200 
+// @Failure 400 
+// @Router /signup [post]
 func Signup(c *gin.Context) {
 	var Body struct {
 		FirstName string
@@ -39,6 +49,14 @@ func Signup(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	var users models.User
+	database.Db.First(&users,"email=?",Body.Email)
+	if users.ID!=0{
+		c.JSON(http.StatusBadRequest,gin.H{
+			"message":"this user already exist.change user email",
+		})
+		return
+	}
 	user := models.User{FirstName: Body.FirstName, LastName: Body.LastName, Email: Body.Email, Password: string(hash), Phone: Body.Phone}
 	result := database.Db.Create(&user)
 	if result.Error != nil {
@@ -52,20 +70,34 @@ func Signup(c *gin.Context) {
 		"success": "OK",
 	})
 }
+type Body struct {
+	Email    string
+	Password string
+}
 
+// LoginWithEmail
+// @Summary User Login
+// @ID user-login-email
+// @Description Login as a user to access the ecommerce site
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user_details body Body true "User details"
+// @Success 200 
+// @Failure 400 
+// @Router /login [post]
 func Login(c *gin.Context) {
-	var Body struct {
-		Email    string
-		Password string
-	}
-	if c.ShouldBind(&Body) != nil {
+	
+	var body Body
+	
+	if c.ShouldBind(&body) != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "failed to get request",
 		})
 		return
 	}
 	var user models.User
-	database.Db.First(&user, "email=?", Body.Email)
+	database.Db.First(&user, "email=?", body.Email)
 	if user.ID == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",
@@ -79,7 +111,7 @@ func Login(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Body.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "wrong password",
@@ -105,6 +137,13 @@ func Login(c *gin.Context) {
 		"token":   tokenString,
 	})
 }
+
+//UserHome 			dodoc
+// @Summary			HomePage
+// @Description 	User Home Page 
+// @Tags 			Users
+// @Success         200 
+// @Router          / [get]	
 func UserHome(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": "Welcome to user home page..!!",
@@ -125,6 +164,16 @@ func OtpGenerator() string {
 	return otps
 }
 
+// Forgot Email
+// @Summary User Forget Password
+// @ID user-forgot-password
+// @Description user can forgot password
+// @Tags Users
+// @Produce json
+// @Param email query string true "Email address of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /forgetemail/:email [get]
 func ForgetPasswordEmail(c *gin.Context) {
 	otps := OtpGenerator()
 	params := c.Param("email")
@@ -136,7 +185,9 @@ func ForgetPasswordEmail(c *gin.Context) {
 		"\r\n" +
 		"<html>This is the email is sent using golang and sendinblue.</html>\r\n" + "<html><h1 style=" + "color:red>" + otps + "</h1></html>")
 
-	status := SentToEmail(from, to, msg)
+	status := SentToEmail(from, to,msg)
+	msgs:=fmt.Sprintf("%s",msg)
+	fmt.Println(from,to,msgs)
 	if status {
 		c.JSON(http.StatusAccepted, gin.H{
 			"Success": "true",
@@ -163,6 +214,20 @@ func SentToEmail(from string, to []string, msg []byte) bool {
 	}
 
 }
+
+
+// Forgot Email
+// @Summary User Forget Password with otp
+// @ID user-forgot-password-otp
+// @Description user can forgot password with otp
+// @Tags Users
+// @Produce json
+//@Param useremail formData string true "email of the user"
+//@Param otp formData string true "otp of the user"
+//@Param password formData string true "new Passsword of the user"
+// @Success 200 
+// @Failure 400 
+// @Router /forgetpassword [get]
 func ForgetPassword(c *gin.Context) {
 	UserEmail := c.Request.FormValue("useremail")
 	var user models.User
